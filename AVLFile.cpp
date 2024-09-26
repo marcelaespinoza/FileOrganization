@@ -22,6 +22,7 @@ struct Record //48
         strncpy(this->nombre, nombre, sizeof(this->nombre) - 1);
         this->nombre[sizeof(this->nombre) - 1] = '\0';
     }
+
     void setData() {
         cout << "Codigo:";
         cin >> cod;
@@ -285,7 +286,7 @@ private:
 
     Record find(long pos_node, int key, fstream &file){
         if(pos_node == -1){
-            return Record();
+            return Record(-1, "bad", -1);
         }
         Record record;
         file.seekg(pos_node *sizeof(Record), ios::beg);
@@ -379,10 +380,6 @@ private:
 
 };
 
-
-
-
-
 void testAVLFile() {
     AVLFile file("data.dat");
 
@@ -427,15 +424,40 @@ extern "C" {
 
         return recordArray; // Retornar puntero al arreglo
     }
+    
+    void insert_record(const char* filename, Record* record) {
+        AVLFile file(filename); 
+        try {
+          file.insert(*record);
+          std::cout << "Inserted record: " << record->cod << std::endl;  // Mensaje de depuración
+          std::cout << "Inserted record: " << record->left << std::endl;  // Mensaje de depuración
+          std::cout << "Inserted record: " << record->right << std::endl;  // Mensaje de depuración
+          std::cout << "Inserted record: " << record->height << std::endl;  // Mensaje de depuración
+        } catch (const std::exception& e) {
+          std::cerr << "Error inserting record: " << e.what() << std::endl;  // Mensaje de error
+        }
+    }
+
+    Record* search_record(const char* filename, int key) {
+        AVLFile file(filename);
+        Record* foundRecord = new Record;
+
+        *foundRecord = file.find(key);  // Suponiendo que `search` devuelve un Record
+        return foundRecord; // Retornar el puntero al registro encontrado
+    }
 
     // Función para liberar memoria (importante)
     void free_records(Record* records) {
         delete[] records; // Liberar la memoria asignada
     }
+
+    void free_record(Record* record) {
+        delete record; // Liberar la memoria asignada
+    }
 }
 
 int main() {
-    //testAVLFile();
+    testAVLFile();
     return 0;
 }
 
