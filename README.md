@@ -3,10 +3,10 @@ Project 1 of data base 2 course
 
 
 ## COMPILAR CODIGOS
-cd /backend/build
-cmake ..
-make 
+`cd /backend/build`
+`cmake ..`
+`make` 
 
 ## Inicias backend
-cd /backend/build
-./backend_bd
+`cd /backend/build`
+`./backend`
