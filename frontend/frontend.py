@@ -114,6 +114,27 @@ def insert_record(window):
 
     window.loading_label.setVisible(False)
 
+# Función para eliminar un registro
+def remove_record(window):
+    window.loading_label.setVisible(True)
+    window.update()
+
+    try:
+        # Obtener los valores de la clave a eliminar, índice y nombre de archivo
+        key = window.remove_key_input.text()
+        index = window.index_combo.currentText()  # Obtener el índice seleccionado
+        filename = "data.dat"
+
+        # Enviar la solicitud de eliminación al backend
+        response = requests.delete(f"http://localhost:8080/remove?index={index}&filename={filename}&key={key}")
+        response.raise_for_status()
+
+        window.time_label.setText(f"Registro con clave {key} eliminado correctamente.")
+
+    except requests.exceptions.RequestException as e:
+        window.time_label.setText(f"Error al eliminar el registro: {e}")
+
+    window.loading_label.setVisible(False)
 
 # Función para actualizar la tabla
 def update_table(window):
@@ -196,6 +217,15 @@ class DataApp(QWidget):
         self.insert_button = QPushButton("Insertar Registro")
         self.insert_button.clicked.connect(lambda: insert_record(self))
         layout.addWidget(self.insert_button)
+
+        # Sección para eliminar un registro
+        self.remove_key_input = QLineEdit()
+        self.remove_key_input.setPlaceholderText("Clave a eliminar")
+        layout.addWidget(self.remove_key_input)
+
+        self.remove_button = QPushButton("Eliminar Registro")
+        self.remove_button.clicked.connect(lambda: remove_record(self))
+        layout.addWidget(self.remove_button)
 
         # Etiqueta para mostrar el tiempo
         self.time_label = QLabel("")
