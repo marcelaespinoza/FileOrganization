@@ -9,4 +9,4 @@ Project 1 of data base 2 course
 
 ## Inicias backend
 `cd /backend/build`
-`./backend`
+`./backend_bd`
