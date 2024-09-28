@@ -1,1 +1,1 @@
-/usr/bin/c++  -g CMakeFiles/backend_bd.dir/src/main.cpp.o CMakeFiles/backend_bd.dir/src/avl.cpp.o -o backend_bd  -lcpprest /usr/lib/libssl.so /usr/lib/libcrypto.so
+/usr/bin/c++  -g CMakeFiles/backend_bd.dir/src/main.cpp.o CMakeFiles/backend_bd.dir/src/avl.cpp.o CMakeFiles/backend_bd.dir/src/avl_handler.cpp.o CMakeFiles/backend_bd.dir/src/sequential_handler.cpp.o -o backend_bd  -lcpprest /usr/lib/libssl.so /usr/lib/libcrypto.so

@@ -10,7 +10,7 @@ include_directories(include)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
 # Añadir el ejecutable
-add_executable(backend_bd src/main.cpp src/avl.cpp)
+add_executable(backend_bd src/main.cpp src/avl.cpp src/avl_handler.cpp src/sequential_handler.cpp)
 
 # Encontrar y vincular cpprestsdk y OpenSSL
 find_package(cpprestsdk REQUIRED)

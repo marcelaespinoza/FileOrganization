@@ -1,17 +1,11 @@
 #include <cpprest/http_listener.h>
-#include <cpprest/json.h>
 #include <cpprest/uri.h>
-#include <vector>
-#include "avl.h"
-#include "sequential_file.h"
-#include "record_sequential.h"
-#include "logger.h"
+#include "avl_handler.cpp"      // Incluye el manejador AVL
+#include "sequential_handler.cpp" // Incluye el manejador secuencial
 
 using namespace web;
 using namespace http;
 using namespace http::experimental::listener;
-
-Logger logger("server.log");
 
 class Server_BD {
 public:
@@ -32,325 +26,50 @@ public:
 
 private:
     http_listener listener;
+    AVLHandler avlHandler; // Manejador AVL
+    SequentialHandler seqHandler; // Manejador secuencial
 
     void handle_get(http_request request) {
-        logger.log("Received GET request.");
-        auto query = uri::split_query(request.relative_uri().query());
+        auto path = request.request_uri().path();
 
-        // Respuesta para Hello World
-        if (request.request_uri().path() == U("/")) {
-            logger.log("Hello World request received.");
-            json::value response_data;
-            response_data[U("message")] = json::value::string(U("Hello, World!"));
-            request.reply(status_codes::OK, response_data);
-            return;
-        }
-
-        if (query.find(U("index")) != query.end() && query[U("index")] == U("avl")) {
-            if (request.request_uri().path() == U("/get_all")) {
-                // Lógica para obtener todos los registros del AVL
-                std::string filename;
-                if (query.find(U("filename")) != query.end()) {
-                    filename = utility::conversions::to_utf8string(query[U("filename")]);
-                    logger.log("Received filename: " + filename);
-
-                    AVLFile avlFile(filename);
-                    auto inorderResult = avlFile.inorder(); 
-
-                    json::value response_data = json::value::array();
-                    for (size_t i = 0; i < inorderResult.size(); ++i) {
-                        json::value recordJson;
-                        recordJson[U("cod")] = json::value::number(inorderResult[i].cod);
-                        recordJson[U("nombre")] = json::value::string(utility::conversions::to_string_t(inorderResult[i].nombre));
-                        recordJson[U("ciclo")] = json::value::number(inorderResult[i].ciclo);
-                        response_data[i] = recordJson;
-                    }
-                    request.reply(status_codes::OK, response_data);
-                } else {
-                    logger.log("Filename parameter is missing.");
-                    request.reply(status_codes::BadRequest, U("Filename parameter is required."));
-                }
-            } else if (request.request_uri().path() == U("/get_record")) {
-                if (query.find(U("key")) != query.end()) {
-                    int key = std::stoi(utility::conversions::to_utf8string(query[U("key")]));
-                    std::string filename;
-
-                    if (query.find(U("filename")) != query.end()) {
-                        filename = utility::conversions::to_utf8string(query[U("filename")]);
-                        logger.log("Received filename: " + filename);
-
-                        AVLFile avlFile(filename);
-                        Record record = avlFile.search_by_key(key);
-
-                        if (record.cod != 0) { 
-                            json::value recordJson;
-                            recordJson[U("cod")] = json::value::number(record.cod);
-                            recordJson[U("nombre")] = json::value::string(utility::conversions::to_string_t(record.nombre));
-                            recordJson[U("ciclo")] = json::value::number(record.ciclo);
-
-                            request.reply(status_codes::OK, recordJson);
-                            logger.log("Record found with key: " + std::to_string(key));
-                        } else {
-                            logger.log("Record not found for key: " + std::to_string(key));
-                            request.reply(status_codes::NotFound, U("Record not found."));
-                        }
-                    } else {
-                        logger.log("Filename parameter is missing.");
-                        request.reply(status_codes::BadRequest, U("Filename parameter is required."));
-                    }
-                } else {
-                    logger.log("Key parameter is missing.");
-                    request.reply(status_codes::BadRequest, U("Key parameter is required."));
-                }
-            } else if (request.request_uri().path() == U("/get_between")) {
-                // Lógica para obtener los registros en un rango de claves (start - end)
-                if (query.find(U("start")) != query.end() && query.find(U("end")) != query.end()) {
-                    int start = std::stoi(utility::conversions::to_utf8string(query[U("start")]));
-                    int end = std::stoi(utility::conversions::to_utf8string(query[U("end")]));
-                    std::string filename;
-
-                    if (query.find(U("filename")) != query.end()) {
-                        filename = utility::conversions::to_utf8string(query[U("filename")]);
-                        logger.log("Received filename: " + filename);
-
-                        AVLFile avlFile(filename);
-                        auto rangeResult = avlFile.rangeSearch(start, end);
-
-                        json::value response_data = json::value::array();
-                        for (size_t i = 0; i < rangeResult.size(); ++i) {
-                            json::value recordJson;
-                            recordJson[U("cod")] = json::value::number(rangeResult[i].cod);
-                            recordJson[U("nombre")] = json::value::string(utility::conversions::to_string_t(rangeResult[i].nombre));
-                            recordJson[U("ciclo")] = json::value::number(rangeResult[i].ciclo);
-                            response_data[i] = recordJson;
-                        }
-                        request.reply(status_codes::OK, response_data);
-                        logger.log("Records found between " + std::to_string(start) + " and " + std::to_string(end));
-                    } else {
-                        logger.log("Filename parameter is missing.");
-                        request.reply(status_codes::BadRequest, U("Filename parameter is required."));
-                    }
-                } else {
-                    logger.log("Start or end parameter is missing.");
-                    request.reply(status_codes::BadRequest, U("Start and end parameters are required."));
-                }
-            } else {
-                logger.log("Path not found.");
-                request.reply(status_codes::NotFound, U("404 Not Found: Invalid path."));
-            }
-        } else if (query.find(U("index")) != query.end() && query[U("index")] == U("sequential")) {
-            if (request.request_uri().path() == U("/get_all")) {
-                // Lógica para obtener todos los registros del AVL
-                std::string filename;
-                if (query.find(U("filename")) != query.end()) {
-                    filename = utility::conversions::to_utf8string(query[U("filename")]);
-                    logger.log("Received filename: " + filename);
-
-                    SequentialFile<int, Record_S> seqFile("datafile.dat", "auxfile.dat");
-                    auto inorderResult = seqFile.get_all(); 
-
-                    json::value response_data = json::value::array();
-                    for (size_t i = 0; i < inorderResult.size(); ++i) {
-                        json::value recordJson;
-                        recordJson[U("key")] = json::value::number(inorderResult[i].key);
-                        recordJson[U("data")] = json::value::string(utility::conversions::to_string_t(inorderResult[i].data));
-                        response_data[i] = recordJson;
-                    }
-                    request.reply(status_codes::OK, response_data);
-                } else {
-                    logger.log("Filename parameter is missing.");
-                    request.reply(status_codes::BadRequest, U("Filename parameter is required."));
-                }
-            } else if (request.request_uri().path() == U("/get_record")) {
-                // Lógica para obtener un registro específico por key (cod)
-                if (query.find(U("key")) != query.end()) {
-                    int key = std::stoi(utility::conversions::to_utf8string(query[U("key")]));
-                    std::string filename;
-
-                    if (query.find(U("filename")) != query.end()) {
-                        filename = utility::conversions::to_utf8string(query[U("filename")]);
-                        logger.log("Received filename: " + filename);
-
-                        SequentialFile<int, Record_S> seqFile("datafile.dat", "auxfile.dat");
-                        Record_S record = seqFile.search_by_key(key);
-
-                        if (record.key != 1) { 
-                            json::value recordJson;
-                            recordJson[U("key")] = json::value::number(record.key);
-                            recordJson[U("data")] = json::value::string(utility::conversions::to_string_t(record.data));
-
-                            request.reply(status_codes::OK, recordJson);
-                            logger.log("Record found with key: " + std::to_string(key));
-                        } else {
-                            logger.log("Record not found for key: " + std::to_string(key));
-                            request.reply(status_codes::NotFound, U("Record not found."));
-                        }
-                    } else {
-                        logger.log("Filename parameter is missing.");
-                        request.reply(status_codes::BadRequest, U("Filename parameter is required."));
-                    }
-                } else {
-                    logger.log("Key parameter is missing.");
-                    request.reply(status_codes::BadRequest, U("Key parameter is required."));
-                }
-            } else if (request.request_uri().path() == U("/get_between")) {
-                // Lógica para obtener los registros en un rango de claves (start - end)
-                if (query.find(U("start")) != query.end() && query.find(U("end")) != query.end()) {
-                    int start = std::stoi(utility::conversions::to_utf8string(query[U("start")]));
-                    int end = std::stoi(utility::conversions::to_utf8string(query[U("end")]));
-                    std::string filename;
-
-                    if (query.find(U("filename")) != query.end()) {
-                        filename = utility::conversions::to_utf8string(query[U("filename")]);
-                        logger.log("Received filename: " + filename);
-
-
-                        SequentialFile<int, Record_S> seqFile("datafile.dat", "auxfile.dat");
-                        std::vector<Record_S> rangeResult = seqFile.get_between(start, end);
-
-                        json::value response_data = json::value::array();
-                        for (size_t i = 0; i < rangeResult.size(); ++i) {
-                            json::value recordJson;
-                            recordJson[U("key")] = json::value::number(rangeResult[i].key);
-                            recordJson[U("data")] = json::value::string(utility::conversions::to_string_t(rangeResult[i].data));
-                            response_data[i] = recordJson;
-                        }
-                        request.reply(status_codes::OK, response_data);
-                        logger.log("Records found between " + std::to_string(start) + " and " + std::to_string(end));
-                    } else {
-                        logger.log("Filename parameter is missing.");
-                        request.reply(status_codes::BadRequest, U("Filename parameter is required."));
-                    }
-                } else {
-                    logger.log("Start or end parameter is missing.");
-                    request.reply(status_codes::BadRequest, U("Start and end parameters are required."));
-                }
-            } else {
-                logger.log("Path not found.");
-                request.reply(status_codes::NotFound, U("404 Not Found: Invalid path."));
-            }
+        if (path.find(U("/avl/get_all")) == 0) {
+            avlHandler.get_all(request, request.request_uri());
+        } else if (path.find(U("/avl/get_record")) == 0) {
+            avlHandler.get_record(request, request.request_uri());
+        } else if (path.find(U("/avl/get_between")) == 0) {
+            avlHandler.get_between(request, request.request_uri());
+        } else if (path.find(U("/sequential/get_all")) == 0) {
+            seqHandler.get_all(request, request.request_uri());
+        } else if (path.find(U("/sequential/get_record")) == 0) {
+            seqHandler.get_record(request, request.request_uri());
+        } else if (path.find(U("/sequential/get_between")) == 0) {
+            seqHandler.get_between(request, request.request_uri());
         } else {
-            logger.log("Invalid index parameter or index not found.");
-            request.reply(status_codes::NotFound, U("404 Not Found: Invalid index parameter."));
+            request.reply(status_codes::NotFound, U("404 Not Found: Invalid path."));
         }
     }
 
     void handle_post(http_request request) {
-        logger.log("Received POST request.");
-        auto query = uri::split_query(request.relative_uri().query());
+        auto path = request.request_uri().path();
 
-        if (query.find(U("index")) != query.end() && query[U("index")] == U("avl")) {
-            std::string filename;
-
-            if (query.find(U("filename")) != query.end()) {
-                filename = utility::conversions::to_utf8string(query[U("filename")]);
-                logger.log("Received filename: " + filename);
-
-                request.extract_json().then([=](json::value request_data) {
-                    if (request_data.has_field(U("cod")) && request_data.has_field(U("nombre")) && request_data.has_field(U("ciclo"))) {
-                        Record record(
-                            request_data[U("cod")].as_integer(),
-                            utility::conversions::to_utf8string(request_data[U("nombre")].as_string()).c_str(),
-                            request_data[U("ciclo")].as_integer()
-                        );
-
-                        AVLFile avlFile(filename);
-                        avlFile.insert(record); // Llama a la función para insertar el registro
-                        logger.log("Record inserted: " + std::to_string(record.cod));
-                        request.reply(status_codes::OK, U("Record added successfully."));
-                    } else {
-                        logger.log("Invalid record format.");
-                        request.reply(status_codes::BadRequest, U("Invalid record format."));
-                    }
-                }).wait();
-            } else {
-                logger.log("Filename parameter is missing.");
-                request.reply(status_codes::BadRequest, U("Filename parameter is required."));
-            }
-        }  else if (query.find(U("index")) != query.end() && query[U("index")] == U("sequential")) {
-            std::string filename;
-
-            if (query.find(U("filename")) != query.end()) {
-                filename = utility::conversions::to_utf8string(query[U("filename")]);
-                logger.log("Received filename: " + filename);
-
-                request.extract_json().then([=](json::value request_data) {
-                    if (request_data.has_field(U("key")) && request_data.has_field(U("data"))) {
-                        Record_S record(
-                            request_data[U("key")].as_integer(),
-                            utility::conversions::to_utf8string(request_data[U("data")].as_string()).c_str()
-                        );
-
-                        SequentialFile<int, Record_S> seqFile("datafile.dat", "auxfile.dat");
-                        seqFile.insertIntoAuxFile(record);
-                        logger.log("Record inserted: " + std::to_string(record.key));
-                        request.reply(status_codes::OK, U("Record added successfully."));
-                    } else {
-                        logger.log("Invalid record format.");
-                        request.reply(status_codes::BadRequest, U("Invalid record format."));
-                    }
-                }).wait();
-            } else {
-                logger.log("Filename parameter is missing.");
-                request.reply(status_codes::BadRequest, U("Filename parameter is required."));
-            }
+        if (path.find(U("/avl/post_record")) == 0) {
+            avlHandler.post_record(request, request.request_uri());
+        } else if (path.find(U("/sequential/post_record")) == 0) {
+            seqHandler.post_record(request, request.request_uri());
         } else {
-            logger.log("Invalid index parameter or index not found.");
-            request.reply(status_codes::NotFound, U("404 Not Found: Invalid index parameter."));
+            request.reply(status_codes::NotFound, U("404 Not Found: Invalid path."));
         }
     }
 
     void handle_delete(http_request request) {
-        logger.log("Received DELETE request.");
-        auto query = uri::split_query(request.relative_uri().query());
+        auto path = request.request_uri().path();
 
-        if (query.find(U("index")) != query.end() && query[U("index")] == U("avl")) {
-            if (query.find(U("key")) != query.end()) {
-                int key = std::stoi(utility::conversions::to_utf8string(query[U("key")]));
-                std::string filename;
-
-                if (query.find(U("filename")) != query.end()) {
-                    filename = utility::conversions::to_utf8string(query[U("filename")]);
-                    logger.log("Received filename: " + filename);
-
-                    AVLFile avlFile(filename);
-                    avlFile.delete_by_key(key); // Llama a la función para eliminar el registro
-                    logger.log("Record deleted with key: " + std::to_string(key));
-                    request.reply(status_codes::OK, U("Record deleted successfully."));
-                } else {
-                    logger.log("Filename parameter is missing.");
-                    request.reply(status_codes::BadRequest, U("Filename parameter is required."));
-                }
-            } else {
-                logger.log("Key parameter is missing.");
-                request.reply(status_codes::BadRequest, U("Key parameter is required."));
-            }
-        } 
-        if (query.find(U("index")) != query.end() && query[U("index")] == U("sequential")) {
-            if (query.find(U("key")) != query.end()) {
-                int key = std::stoi(utility::conversions::to_utf8string(query[U("key")]));
-                std::string filename;
-
-                if (query.find(U("filename")) != query.end()) {
-                    filename = utility::conversions::to_utf8string(query[U("filename")]);
-                    logger.log("Received filename: " + filename);
-
-                    SequentialFile<int, Record_S> seqFile("datafile.dat", "auxfile.dat");
-                    seqFile.delete_by_key(key);
-                    logger.log("Record deleted with key: " + std::to_string(key));
-                    request.reply(status_codes::OK, U("Record deleted successfully."));
-                } else {
-                    logger.log("Filename parameter is missing.");
-                    request.reply(status_codes::BadRequest, U("Filename parameter is required."));
-                }
-            } else {
-                logger.log("Key parameter is missing.");
-                request.reply(status_codes::BadRequest, U("Key parameter is required."));
-            }
-        }
-        else {
-            logger.log("Invalid index parameter or index not found.");
-            request.reply(status_codes::NotFound, U("404 Not Found: Invalid index parameter."));
+        if (path.find(U("/avl/delete_record")) == 0) {
+            avlHandler.delete_record(request, request.request_uri());
+        } else if (path.find(U("/sequential/delete_record")) == 0) {
+            seqHandler.delete_record(request, request.request_uri());
+        } else {
+            request.reply(status_codes::NotFound, U("404 Not Found: Invalid path."));
         }
     }
 };

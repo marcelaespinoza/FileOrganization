@@ -153,6 +153,30 @@ src/avl.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_bd.dir/build.make CMakeFiles/backend_bd.dir/src/avl.cpp.s
 .PHONY : src/avl.cpp.s
 
+src/avl_handler.o: src/avl_handler.cpp.o
+.PHONY : src/avl_handler.o
+
+# target to build an object file
+src/avl_handler.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_bd.dir/build.make CMakeFiles/backend_bd.dir/src/avl_handler.cpp.o
+.PHONY : src/avl_handler.cpp.o
+
+src/avl_handler.i: src/avl_handler.cpp.i
+.PHONY : src/avl_handler.i
+
+# target to preprocess a source file
+src/avl_handler.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_bd.dir/build.make CMakeFiles/backend_bd.dir/src/avl_handler.cpp.i
+.PHONY : src/avl_handler.cpp.i
+
+src/avl_handler.s: src/avl_handler.cpp.s
+.PHONY : src/avl_handler.s
+
+# target to generate assembly for a file
+src/avl_handler.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_bd.dir/build.make CMakeFiles/backend_bd.dir/src/avl_handler.cpp.s
+.PHONY : src/avl_handler.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -177,6 +201,30 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_bd.dir/build.make CMakeFiles/backend_bd.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/sequential_handler.o: src/sequential_handler.cpp.o
+.PHONY : src/sequential_handler.o
+
+# target to build an object file
+src/sequential_handler.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_bd.dir/build.make CMakeFiles/backend_bd.dir/src/sequential_handler.cpp.o
+.PHONY : src/sequential_handler.cpp.o
+
+src/sequential_handler.i: src/sequential_handler.cpp.i
+.PHONY : src/sequential_handler.i
+
+# target to preprocess a source file
+src/sequential_handler.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_bd.dir/build.make CMakeFiles/backend_bd.dir/src/sequential_handler.cpp.i
+.PHONY : src/sequential_handler.cpp.i
+
+src/sequential_handler.s: src/sequential_handler.cpp.s
+.PHONY : src/sequential_handler.s
+
+# target to generate assembly for a file
+src/sequential_handler.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_bd.dir/build.make CMakeFiles/backend_bd.dir/src/sequential_handler.cpp.s
+.PHONY : src/sequential_handler.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -189,9 +237,15 @@ help:
 	@echo "... src/avl.o"
 	@echo "... src/avl.i"
 	@echo "... src/avl.s"
+	@echo "... src/avl_handler.o"
+	@echo "... src/avl_handler.i"
+	@echo "... src/avl_handler.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/sequential_handler.o"
+	@echo "... src/sequential_handler.i"
+	@echo "... src/sequential_handler.s"
 .PHONY : help
 
 
