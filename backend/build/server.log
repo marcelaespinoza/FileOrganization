@@ -1,290 +1,66 @@
-Thu Sep 26 12:03:12 2024
+Fri Sep 27 22:51:14 2024
 : Received GET request.
-Thu Sep 26 12:03:37 2024
-: Received GET request.
-Thu Sep 26 12:03:37 2024
-: Received filename: data.dat
-Thu Sep 26 12:03:47 2024
-: Received GET request.
-Thu Sep 26 12:03:47 2024
-: Received filename: data.dat
-Thu Sep 26 12:08:10 2024
-: Received GET request.
-Thu Sep 26 12:08:12 2024
-: Received GET request.
-Thu Sep 26 12:08:12 2024
-: Received filename: data.dat
-Thu Sep 26 12:08:15 2024
-: Received GET request.
-Thu Sep 26 12:08:15 2024
-: Received filename: data.dat
-Thu Sep 26 12:08:15 2024
-: Received GET request.
-Thu Sep 26 12:08:15 2024
-: Received filename: data.dat
-Thu Sep 26 12:08:16 2024
-: Received GET request.
-Thu Sep 26 12:08:16 2024
-: Received filename: data.dat
-Thu Sep 26 12:08:46 2024
-: Received POST request.
-Thu Sep 26 12:08:46 2024
-: Received filename: data.dat
-Thu Sep 26 12:08:46 2024
-: Record inserted: 1
-Thu Sep 26 12:08:50 2024
-: Received GET request.
-Thu Sep 26 12:08:50 2024
-: Received filename: data.dat
-Thu Sep 26 12:08:56 2024
-: Received POST request.
-Thu Sep 26 12:08:56 2024
-: Received filename: data.dat
-Thu Sep 26 12:08:56 2024
-: Record inserted: 100
-Thu Sep 26 12:08:58 2024
-: Received GET request.
-Thu Sep 26 12:08:58 2024
-: Received filename: data.dat
-Thu Sep 26 12:09:02 2024
-: Received POST request.
-Thu Sep 26 12:09:02 2024
-: Received filename: data.dat
-Thu Sep 26 12:09:02 2024
-: Record inserted: 20
-Thu Sep 26 12:09:05 2024
-: Received GET request.
-Thu Sep 26 12:09:05 2024
-: Received filename: data.dat
-Thu Sep 26 12:09:21 2024
-: Received GET request.
-Thu Sep 26 12:09:21 2024
-: Received filename: data.dat
-Thu Sep 26 12:09:24 2024
-: Received GET request.
-Thu Sep 26 12:09:24 2024
-: Received filename: data.dat
-Thu Sep 26 12:09:57 2024
-: Received GET request.
-Thu Sep 26 12:09:59 2024
-: Received GET request.
-Thu Sep 26 12:09:59 2024
-: Received filename: data.dat
-Thu Sep 26 12:12:02 2024
-: Received GET request.
-Thu Sep 26 12:12:04 2024
-: Received GET request.
-Thu Sep 26 12:12:04 2024
-: Received filename: data.dat
-Thu Sep 26 12:12:07 2024
-: Received POST request.
-Thu Sep 26 12:12:07 2024
-: Received filename: data.dat
-Thu Sep 26 12:12:07 2024
-: Record inserted: 20
-Thu Sep 26 12:12:09 2024
-: Received GET request.
-Thu Sep 26 12:12:09 2024
-: Received filename: data.dat
-Thu Sep 26 12:12:17 2024
-: Received POST request.
-Thu Sep 26 12:12:17 2024
-: Received filename: data.dat
-Thu Sep 26 12:12:17 2024
-: Record inserted: 100
-Thu Sep 26 12:12:19 2024
-: Received GET request.
-Thu Sep 26 12:12:19 2024
-: Received filename: data.dat
-Thu Sep 26 12:12:23 2024
-: Received POST request.
-Thu Sep 26 12:12:23 2024
-: Received filename: data.dat
-Thu Sep 26 12:12:23 2024
-: Record inserted: 1
-Thu Sep 26 12:12:26 2024
-: Received GET request.
-Thu Sep 26 12:12:26 2024
-: Received filename: data.dat
-Thu Sep 26 12:16:45 2024
-: Received GET request.
-Thu Sep 26 12:16:47 2024
-: Received GET request.
-Thu Sep 26 12:16:47 2024
-: Received filename: data.dat
-Thu Sep 26 12:16:55 2024
-: Received POST request.
-Thu Sep 26 12:16:55 2024
-: Received filename: data.dat
-Thu Sep 26 12:16:55 2024
-: Record inserted: 28
-Thu Sep 26 12:16:57 2024
-: Received GET request.
-Thu Sep 26 12:16:57 2024
-: Received filename: data.dat
-Thu Sep 26 13:11:47 2024
-: Received GET request.
-Thu Sep 26 13:11:47 2024
-: Received filename: data.dat
-Thu Sep 26 13:11:58 2024
-: Received POST request.
-Thu Sep 26 13:11:58 2024
-: Received filename: data.dat
-Thu Sep 26 13:11:58 2024
-: Record inserted: 53
-Thu Sep 26 13:12:01 2024
-: Received GET request.
-Thu Sep 26 13:12:01 2024
-: Received filename: data.dat
-Thu Sep 26 13:13:08 2024
-: Received GET request.
-Thu Sep 26 13:13:08 2024
-: Received filename: data.dat with start: 20 and end: 50
-Thu Sep 26 13:13:16 2024
-: Received GET request.
-Thu Sep 26 13:13:16 2024
-: Received filename: data.dat with start: 20 and end: 54
-Thu Sep 26 13:20:29 2024
-: Received GET request.
-Thu Sep 26 13:20:29 2024
-: Received filename: data.dat
-Thu Sep 26 13:20:32 2024
-: Received GET request.
-Thu Sep 26 13:20:32 2024
-: Received filename: data.dat with start: 20 and end: 54
-Thu Sep 26 13:20:40 2024
-: Received DELETE request.
-Thu Sep 26 13:20:44 2024
-: Received GET request.
-Thu Sep 26 13:20:44 2024
-: Received filename: data.dat with start: 20 and end: 54
-Thu Sep 26 13:20:47 2024
-: Received DELETE request.
-Thu Sep 26 13:28:38 2024
-: Received GET request.
-Thu Sep 26 13:28:38 2024
-: Invalid index parameter or index not found.
-Thu Sep 26 13:28:39 2024
-: Received GET request.
-Thu Sep 26 13:28:39 2024
-: Invalid index parameter or index not found.
-Thu Sep 26 13:28:40 2024
-: Received GET request.
-Thu Sep 26 13:28:40 2024
-: Invalid index parameter or index not found.
-Thu Sep 26 13:28:48 2024
-: Received GET request.
-Thu Sep 26 13:28:48 2024
-: Received filename: data.dat
-Thu Sep 26 13:28:56 2024
-: Received POST request.
-Thu Sep 26 13:28:56 2024
-: Received filename: data.dat
-Thu Sep 26 13:28:56 2024
-: Record inserted: 150
-Thu Sep 26 13:28:59 2024
-: Received GET request.
-Thu Sep 26 13:28:59 2024
-: Received filename: data.dat
-Thu Sep 26 13:29:04 2024
-: Received GET request.
-Thu Sep 26 13:29:04 2024
-: Range search from 20 to 54
-Thu Sep 26 13:29:07 2024
-: Received DELETE request.
-Thu Sep 26 13:29:07 2024
-: Received filename: data.dat
-Thu Sep 26 13:29:07 2024
-: Record with key 28 deleted.
-Thu Sep 26 13:29:12 2024
-: Received GET request.
-Thu Sep 26 13:29:12 2024
-: Range search from 20 to 54
-Thu Sep 26 13:29:14 2024
-: Received GET request.
-Thu Sep 26 13:29:14 2024
-: Received filename: data.dat
-Thu Sep 26 13:30:33 2024
-: Received GET request.
-Thu Sep 26 13:30:33 2024
+Fri Sep 27 22:51:14 2024
 : Hello World request received.
-Thu Sep 26 13:30:35 2024
-: Received GET request.
-Thu Sep 26 13:30:35 2024
-: Received filename: data.dat
-Thu Sep 26 13:30:39 2024
-: Received GET request.
-Thu Sep 26 13:30:39 2024
-: Range search from 20 to 54
-Thu Sep 26 13:42:00 2024
-: Received GET request.
-Thu Sep 26 13:42:00 2024
-: Hello World request received.
-Thu Sep 26 13:42:02 2024
-: Received GET request.
-Thu Sep 26 13:42:02 2024
-: Received filename: data.dat
-Thu Sep 26 13:42:05 2024
-: Received GET request.
-Thu Sep 26 13:42:05 2024
-: Path not found.
-Thu Sep 26 13:42:06 2024
-: Received GET request.
-Thu Sep 26 13:42:06 2024
-: Path not found.
-Thu Sep 26 13:42:07 2024
-: Received GET request.
-Thu Sep 26 13:42:07 2024
-: Path not found.
-Thu Sep 26 13:42:13 2024
-: Received GET request.
-Thu Sep 26 13:42:13 2024
-: Received filename: data.dat
-Thu Sep 26 13:42:13 2024
-: Record found with key: 20
-Thu Sep 26 13:47:04 2024
-: Received GET request.
-Thu Sep 26 13:47:04 2024
-: Received filename: data.dat
-Thu Sep 26 13:47:07 2024
-: Received GET request.
-Thu Sep 26 13:47:07 2024
-: Received filename: data.dat
-Thu Sep 26 13:47:09 2024
-: Received GET request.
-Thu Sep 26 13:47:09 2024
-: Received filename: data.dat
-Thu Sep 26 13:47:09 2024
-: Records found between 20 and 54
-Thu Sep 26 13:47:22 2024
+Fri Sep 27 22:51:16 2024
 : Received POST request.
-Thu Sep 26 13:47:22 2024
-: Received filename: data.dat
-Thu Sep 26 13:47:22 2024
-: Record inserted: 180
-Thu Sep 26 13:47:24 2024
+Fri Sep 27 22:51:16 2024
+: Received filename: datafile.dat
+Fri Sep 27 22:51:16 2024
+: Record inserted: 20
+Fri Sep 27 22:51:19 2024
 : Received GET request.
-Thu Sep 26 13:47:24 2024
+Fri Sep 27 22:51:19 2024
 : Received filename: data.dat
-Thu Sep 26 13:47:34 2024
+Fri Sep 27 22:51:27 2024
+: Received POST request.
+Fri Sep 27 22:51:27 2024
+: Received filename: datafile.dat
+Fri Sep 27 22:51:27 2024
+: Record inserted: 50
+Fri Sep 27 22:51:29 2024
 : Received GET request.
-Thu Sep 26 13:47:34 2024
+Fri Sep 27 22:51:29 2024
 : Received filename: data.dat
-Thu Sep 26 13:47:34 2024
-: Record found with key: 180
-Thu Sep 26 13:47:46 2024
+Fri Sep 27 22:51:35 2024
+: Received POST request.
+Fri Sep 27 22:51:35 2024
+: Received filename: datafile.dat
+Fri Sep 27 22:51:35 2024
+: Record inserted: 12
+Fri Sep 27 22:51:38 2024
+: Received GET request.
+Fri Sep 27 22:51:38 2024
+: Received filename: data.dat
+Fri Sep 27 22:51:48 2024
+: Received POST request.
+Fri Sep 27 22:51:48 2024
+: Received filename: datafile.dat
+Fri Sep 27 22:51:48 2024
+: Record inserted: 22
+Fri Sep 27 22:51:50 2024
+: Received GET request.
+Fri Sep 27 22:51:50 2024
+: Received filename: data.dat
+Fri Sep 27 22:51:57 2024
 : Received DELETE request.
-Thu Sep 26 13:47:46 2024
+Fri Sep 27 22:51:57 2024
 : Received filename: data.dat
-Thu Sep 26 13:47:46 2024
-: Record deleted with key: 180
-Thu Sep 26 13:47:47 2024
+Fri Sep 27 22:51:57 2024
+: Record deleted with key: 22
+Fri Sep 27 22:52:00 2024
 : Received GET request.
-Thu Sep 26 13:47:47 2024
+Fri Sep 27 22:52:00 2024
 : Received filename: data.dat
-Thu Sep 26 13:47:47 2024
-: Records found between 20 and 54
-Thu Sep 26 13:47:50 2024
+Fri Sep 27 22:52:06 2024
 : Received GET request.
-Thu Sep 26 13:47:50 2024
+Fri Sep 27 22:52:06 2024
 : Received filename: data.dat
+Fri Sep 27 22:52:06 2024
+: Record found with key: 12
+Fri Sep 27 22:52:12 2024
+: Received GET request.
+Fri Sep 27 22:52:12 2024
+: Received filename: data.dat
+Fri Sep 27 22:52:12 2024
+: Records found between 10 and 30

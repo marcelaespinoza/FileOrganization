@@ -1,7 +1,7 @@
 CMakeFiles/backend_bd.dir/src/avl.cpp.o: \
- /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/backend/src/avl.cpp \
+ /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/src/avl.cpp \
  /usr/include/stdc-predef.h \
- /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/backend/include/avl.h \
+ /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/include/avl.h \
  /usr/include/c++/14.2.1/iostream \
  /usr/include/c++/14.2.1/bits/requires_hosted.h \
  /usr/include/c++/14.2.1/x86_64-pc-linux-gnu/bits/c++config.h \
@@ -140,6 +140,6 @@ CMakeFiles/backend_bd.dir/src/avl.cpp.o: \
  /usr/include/c++/14.2.1/x86_64-pc-linux-gnu/bits/basic_file.h \
  /usr/include/c++/14.2.1/x86_64-pc-linux-gnu/bits/c++io.h \
  /usr/include/c++/14.2.1/bits/fstream.tcc \
- /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/backend/include/record.h \
+ /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/include/record.h \
  /usr/include/c++/14.2.1/cstring /usr/include/string.h \
  /usr/include/strings.h

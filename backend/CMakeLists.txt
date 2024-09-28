@@ -7,6 +7,8 @@ set(CMAKE_CXX_STANDARD 14)
 # Añadir los directorios de inclusión
 include_directories(include)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+
 # Añadir el ejecutable
 add_executable(backend_bd src/main.cpp src/avl.cpp)
 

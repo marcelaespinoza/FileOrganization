@@ -1,4 +1,4 @@
-# Install script for directory: /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/backend
+# Install script for directory: /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -57,6 +57,6 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-  file(WRITE "/home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/backend/build/${CMAKE_INSTALL_MANIFEST}"
+  file(WRITE "/home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()

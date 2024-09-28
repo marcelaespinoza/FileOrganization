@@ -1,5 +1,5 @@
 CMakeFiles/backend_bd.dir/src/main.cpp.o: \
- /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/backend/src/main.cpp \
+ /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/src/main.cpp \
  /usr/include/stdc-predef.h /usr/include/cpprest/http_listener.h \
  /usr/include/cpprest/http_msg.h /usr/include/cpprest/asyncrt_utils.h \
  /usr/include/cpprest/details/basic_types.h \
@@ -849,6 +849,8 @@ CMakeFiles/backend_bd.dir/src/main.cpp.o: \
  /usr/include/boost/asio/ssl/detail/read_op.hpp \
  /usr/include/boost/asio/ssl/detail/shutdown_op.hpp \
  /usr/include/boost/asio/ssl/detail/write_op.hpp \
- /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/backend/include/avl.h \
- /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/backend/include/record.h \
- /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/backend/include/logger.h
+ /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/include/avl.h \
+ /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/include/record.h \
+ /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/include/sequential_file.h \
+ /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/include/record_sequential.h \
+ /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/include/logger.h

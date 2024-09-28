@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/backend/include
+CXX_INCLUDES = -I/home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/include
 
-CXX_FLAGS = -std=gnu++14
+CXX_FLAGS =  -g -std=gnu++14
 
