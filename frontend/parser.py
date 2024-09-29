@@ -1,245 +1,183 @@
 import sys
-import time
 import requests
 from PyQt5.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QHBoxLayout, QComboBox, QLineEdit, QTextEdit)
+    QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QTextEdit)
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
-import re
 
-# Variables globales
-page_size = 100
-current_page = 0
-data = []
-columns = []  #lista dinámica que guarda las columnas de la tabla
+# Funciones puras para manejar los comandos
+def create_table(command):
+    if "game" in command and "avl" in command:
+        return "La tabla 'game' con índice 'avl' fue creada (simulación)."
+    return "Error: Solo se puede crear la tabla 'game' usando el índice 'avl'."
 
-# Parser SQL con soporte para `USING INDEX` y columnas variables
-def sql_parser(window, query):
-    query = query.strip().upper()
+def insert_from_file(command):
+    if "game" in command:
+        csv_path = command.split("'")[1]
+        return read_csv_from_file(csv_path)
+    return "Error: Solo se puede insertar desde archivos a la tabla 'game'."
 
-    # Verificar si se está usando un índice específico
-    index_match = re.search(r"USING INDEX (HASH|BTREE|AVL)", query)
-    if index_match:
-        index = index_match.group(1).lower()
+def read_csv_from_file(csv_path):
+    try:
+        payload = {"csv_path": csv_path}
+        response = requests.post(f"http://localhost:8080/avl/read_csv?table_name=game", json=payload)
+        response.raise_for_status()
+        return f"Datos del archivo {csv_path} insertados correctamente."
+    except requests.exceptions.RequestException as e:
+        return f"Error al leer el CSV: {e}"
+
+def search_by_key(command):
+    if "game" in command and "clave = " in command:
+        key = extract_key_from_command(command)
+        return fetch_record(key)
+    return "Error: El comando no está bien formado o no contiene una clave válida."
+
+def fetch_record(key):
+    try:
+        response = requests.get(f"http://localhost:8080/avl/get_record?table_name=game&key={key}")
+        response.raise_for_status()
+        return f"Registro con clave {key}: {response.json()}"
+    except requests.exceptions.RequestException as e:
+        return f"Error al obtener el registro: {e}"
+
+def range_search(command):
+    if "game" in command and "between" in command:
+        start, end = extract_range_from_command(command)
+        return fetch_data_between(start, end)
+    return "Error: El comando no está bien formado o no contiene un rango válido."
+
+def fetch_data_between(start, end):
+    try:
+        response = requests.get(f"http://localhost:8080/avl/get_between?table_name=game&start={start}&end={end}")
+        response.raise_for_status()
+        return f"Registros entre {start} y {end}: {response.json()}"
+    except requests.exceptions.RequestException as e:
+        return f"Error al obtener los datos: {e}"
+
+def insert_values(command):
+    if "game" in command:
+        values = extract_values_from_command(command)
+        return insert_record(values)
+    return "Error: Solo se puede insertar en la tabla 'game'."
+
+def insert_record(values):
+    try:
+        payload = values
+        response = requests.post(f"http://localhost:8080/avl/post_record?table_name=game", json=payload)
+        response.raise_for_status()
+        return "Registro insertado correctamente."
+    except requests.exceptions.RequestException as e:
+        return f"Error al insertar el registro: {e}"
+
+def delete_by_key(command):
+    if "game" in command and "clave = " in command:
+        key = extract_key_from_command(command)
+        return remove_record(key)
+    return "Error: El comando no está bien formado o no contiene una clave válida."
+
+def remove_record(key):
+    try:
+        response = requests.delete(f"http://localhost:8080/avl/delete_record?table_name=game&key={key}")
+        response.raise_for_status()
+        return f"Registro con clave {key} eliminado correctamente."
+    except requests.exceptions.RequestException as e:
+        return f"Error al eliminar el registro: {e}"
+
+# Funciones puras auxiliares para extraer datos de los comandos
+def extract_key_from_command(command):
+    try:
+        return command.split("clave = ")[1].strip().strip(";")
+    except IndexError:
+        return None
+
+def extract_range_from_command(command):
+    try:
+        return command.split("between")[1].strip().strip(";").split(" and ")
+    except IndexError:
+        return None, None
+
+def extract_values_from_command(command):
+    values = command.split("values")[1].strip(" ();").split(",")
+    return {
+        "key": int(values[0]),
+        "Rank": int(values[0]),
+        "GameTitle": values[1].strip(),
+        "Platform": values[2].strip(),
+        "Year": int(values[3]),
+        "Genre": values[4].strip(),
+        "Publisher": values[5].strip(),
+        "NorthAmerica": float(values[6]),
+        "Europe": float(values[7]),
+        "Japan": float(values[8]),
+        "RestOfWorld": float(values[9]),
+        "Global": float(values[10]),
+        "Review": float(values[11])
+    }
+
+# Función pura para procesar los comandos
+def process_command(command):
+    command = command.lower().strip()
+
+    if command.startswith("create table"):
+        return create_table(command)
+    elif command.startswith("insert into table") and "from file" in command:
+        return insert_from_file(command)
+    elif command.startswith("select * from") and "clave = " in command:
+        return search_by_key(command)
+    elif command.startswith("select * from") and "between" in command:
+        return range_search(command)
+    elif command.startswith("insert into"):
+        return insert_values(command)
+    elif command.startswith("delete from") and "clave = " in command:
+        return delete_by_key(command)
     else:
-        index = window.index_combo.currentText()  # Si no se especifica índice, se usa el seleccionado en la interfaz
+        return "Comando no reconocido."
 
-    # SELECT * FROM table
-    if re.match(r"SELECT \* FROM \w+", query):
-        table_name = query.split("FROM")[1].split("USING")[0].strip().lower() + ".dat"
-        window.time_label.setText(f"Fetching data from {table_name} using index {index}")
-        fetch_data(window, table_name, index)
-    
-    # SELECT * FROM table WHERE key BETWEEN x AND y
-    elif re.match(r"SELECT \* FROM \w+ WHERE KEY BETWEEN \d+ AND \d+", query):
-        table_name, start, end = re.findall(r"FROM (\w+) WHERE KEY BETWEEN (\d+) AND (\d+)", query)[0]
-        window.time_label.setText(f"Fetching data from {table_name} between {start} and {end} using index {index}")
-        fetch_data_between(window, table_name.lower() + ".dat", start, end, index)
-    
-    # INSERT INTO table (col1, col2, col3) VALUES (1, 'value', 2)
-    elif re.match(r"INSERT INTO \w+ \(\w+(, \w+)*\) VALUES \((\d+|'[^']*')(, (\d+|'[^']*'))*\)", query):
-        insert_match = re.findall(r"INTO (\w+).*VALUES \((.*)\)", query)[0]
-        table_name = insert_match[0]
-        values = insert_match[1].split(", ")
-        cols = re.findall(r"INTO \w+ \((.*)\)", query)[0].split(", ")
-
-        window.time_label.setText(f"Inserting record into {table_name} using index {index}")
-        insert_record(window, table_name.lower() + ".dat", cols, values, index)
-    
-    # DELETE FROM table WHERE key = x
-    elif re.match(r"DELETE FROM \w+ WHERE KEY = \d+", query):
-        table_name, key = re.findall(r"FROM (\w+) WHERE KEY = (\d+)", query)[0]
-        window.time_label.setText(f"Deleting record with key {key} from {table_name} using index {index}")
-        remove_record(window, table_name.lower() + ".dat", key, index)
-    
-    # CREATE TABLE table_name (col1, col2, col3)
-    elif re.match(r"CREATE TABLE \w+ \(.+\)", query):
-        table_name = query.split("TABLE")[1].split("(")[0].strip().lower() + ".dat"
-        window.time_label.setText(f"Creating table {table_name}")
-        create_table(window, table_name)
-    
-    else:
-        window.time_label.setText("Comando SQL no reconocido")
-
-# Función para obtener los datos desde el backend con el endpoint get_all
-def fetch_data(window, filename="data.dat", index="hash"):
-    window.loading_label.setVisible(True)
-    window.update()
-
-    start_time = time.time()
-
-    try:
-        response = requests.get(f"http://localhost:8080/get_all?index={index}&filename={filename}")
-        response.raise_for_status()
-        global data, columns
-        result = response.json()
-
-        data = result["records"]
-        columns = result["columns"]  # Las columnas vienen desde el backend
-
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        window.time_label.setText(f"Datos cargados en {elapsed_time:.2f} segundos usando el índice {index}")
-
-        update_table(window)
-
-    except requests.exceptions.RequestException as e:
-        window.time_label.setText(f"Error al obtener los datos: {e}")
-
-    window.loading_label.setVisible(False)
-
-# Función para obtener datos con el endpoint get_between
-def fetch_data_between(window, filename, start, end, index="hash"):
-    window.loading_label.setVisible(True)
-    window.update()
-
-    try:
-        response = requests.get(f"http://localhost:8080/get_between?index={index}&filename={filename}&start={start}&end={end}")
-        response.raise_for_status()
-        global data, columns
-        result = response.json()
-
-        data = result["records"]
-        columns = result["columns"]  # Las columnas vienen desde el backend
-
-        window.time_label.setText(f"Datos entre {start} y {end} cargados usando el índice {index}")
-        update_table(window)
-
-    except requests.exceptions.RequestException as e:
-        window.time_label.setText(f"Error al obtener los datos: {e}")
-
-    window.loading_label.setVisible(False)
-
-# Función para insertar un nuevo registro
-def insert_record(window, filename, cols, values, index="hash"):
-    window.loading_label.setVisible(True)
-    window.update()
-
-    try:
-        payload = dict(zip(cols, values))
-
-        response = requests.post(f"http://localhost:8080/insert?index={index}&filename={filename}", json=payload)
-        response.raise_for_status()
-
-        window.time_label.setText(f"Registro insertado correctamente usando el índice {index}.")
-
-    except requests.exceptions.RequestException as e:
-        window.time_label.setText(f"Error al insertar el registro: {e}")
-
-    window.loading_label.setVisible(False)
-
-# Función para eliminar un registro
-def remove_record(window, filename, key, index="hash"):
-    window.loading_label.setVisible(True)
-    window.update()
-
-    try:
-        response = requests.delete(f"http://localhost:8080/remove?index={index}&filename={filename}&key={key}")
-        response.raise_for_status()
-
-        window.time_label.setText(f"Registro con clave {key} eliminado correctamente usando el índice {index}.")
-
-    except requests.exceptions.RequestException as e:
-        window.time_label.setText(f"Error al eliminar el registro: {e}")
-
-    window.loading_label.setVisible(False)
-
-# Función para crear un archivo que simula una tabla
-def create_table(window, filename):
-    try:
-        with open(filename, 'w') as f:
-            f.write("")  # Crear un archivo vacío
-
-        window.time_label.setText(f"Tabla {filename} creada correctamente.")
-
-    except IOError as e:
-        window.time_label.setText(f"Error al crear la tabla: {e}")
-
-# Función para actualizar la tabla en la interfaz con columnas dinámicas
-def update_table(window):
-    global current_page, columns
-
-    window.table.setColumnCount(len(columns))  # Ajustar el número de columnas
-    window.table.setHorizontalHeaderLabels(columns)  # Ajustar los nombres de las columnas
-
-    window.table.setRowCount(0)
-
-    start_index = current_page * page_size
-    end_index = start_index + page_size
-    for row_index, item in enumerate(data[start_index:end_index]):
-        window.table.insertRow(row_index)
-        for col_index, col_name in enumerate(columns):
-            window.table.setItem(row_index, col_index, QTableWidgetItem(str(item[col_name])))
-
-class SQLApp(QWidget):
+# Frontend para ingresar y mostrar comandos
+class CommandApp(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("SQL Parser con Backend C++")
-        self.setGeometry(100, 100, 600, 600)
+        self.setWindowTitle("Parser SQL-like para AVL Backend")
+        self.setGeometry(100, 100, 600, 400)
 
         layout = QVBoxLayout()
 
-        # ComboBox para seleccionar el índice por defecto
-        self.index_combo = QComboBox()
-        self.index_combo.addItems(["avl", "btree", "hash"])
-        layout.addWidget(self.index_combo)
+        # Entrada para el comando SQL-like
+        self.command_input = QTextEdit()
+        layout.addWidget(self.command_input)
 
-        # Cuadro de texto para el comando SQL
-        self.sql_input = QTextEdit()
-        self.sql_input.setPlaceholderText("Escribe tu consulta SQL aquí...")
-        layout.addWidget(self.sql_input)
-
-        # Botón para ejecutar el comando SQL
-        self.execute_button = QPushButton("Ejecutar SQL")
-        self.execute_button.clicked.connect(lambda: sql_parser(self, self.sql_input.toPlainText()))
+        # Botón para ejecutar el comando
+        self.execute_button = QPushButton("Ejecutar Comando")
+        self.execute_button.clicked.connect(self.execute_command)
         layout.addWidget(self.execute_button)
 
-        # Etiqueta para mostrar el tiempo
-        self.time_label = QLabel("")
-        layout.addWidget(self.time_label)
+        # Etiqueta para mostrar el resultado
+        self.result_label = QLabel("")
+        layout.addWidget(self.result_label)
 
-        # Tabla de datos
-        self.table = QTableWidget()
-        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
-        layout.addWidget(self.table)
-
-        # Ícono de cargando
-        self.loading_label = QLabel()
-        self.loading_pixmap = QPixmap("loading.gif")  # Ruta a un gif o imagen de cargando
-        self.loading_label.setPixmap(self.loading_pixmap)
-        self.loading_label.setVisible(False)  # Oculto por defecto
+        # Ícono de "cargando"
+        self.loading_label = QLabel(self)
+        pixmap = QPixmap("loading.gif").scaled(50, 50, Qt.KeepAspectRatio)
+        self.loading_label.setPixmap(pixmap)
+        self.loading_label.setVisible(False)
         layout.addWidget(self.loading_label)
-
-        # Paginación
-        pagination_layout = QHBoxLayout()
-
-        prev_button = QPushButton("Anterior")
-        prev_button.clicked.connect(self.prev_page)
-        pagination_layout.addWidget(prev_button)
-
-        next_button = QPushButton("Siguiente")
-        next_button.clicked.connect(self.next_page)
-        pagination_layout.addWidget(next_button)
-
-        layout.addLayout(pagination_layout)
 
         self.setLayout(layout)
 
-    def prev_page(self):
-        global current_page
-        if current_page > 0:
-            current_page -= 1
-            update_table(self)
+    # Función para ejecutar el comando y mostrar el resultado
+    def execute_command(self):
+        self.loading_label.setVisible(True)
+        self.update()
 
-    def next_page(self):
-        global current_page
-        if current_page < len(data) // page_size:
-            current_page += 1
-            update_table(self)
+        command = self.command_input.toPlainText()
+        result = process_command(command)
+
+        self.result_label.setText(result)
+        self.loading_label.setVisible(False)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = SQLApp()
+    window = CommandApp()
     window.show()
     sys.exit(app.exec_())
