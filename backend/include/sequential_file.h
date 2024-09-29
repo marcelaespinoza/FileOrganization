@@ -39,7 +39,6 @@ SequentialFile<Key, T>::SequentialFile(const std::string& dataFileName, const st
         std::ofstream outFile(dataFileName, std::ios::binary);
         T dummy;
         dummy.key = -1;
-        strcpy(dummy.data, "Dummy");
         dummy.pos = 0; // Dummy es la primera posición en el datafile
         outFile.write(reinterpret_cast<const char*>(&dummy), sizeof(T));
         outFile.close();

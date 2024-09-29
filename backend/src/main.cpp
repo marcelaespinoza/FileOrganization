@@ -94,7 +94,7 @@ private:
         else if (path.find(U("/sequential/post_record")) == 0) {
             seqHandler.post_record(request, request.request_uri());
         } else if(path.find(U("/sequential/read_csv")) == 0){
-
+            seqHandler.post_csv(request, request.request_uri());
         } 
         else {
             request.reply(status_codes::NotFound, U("404 Not Found: Invalid path."));

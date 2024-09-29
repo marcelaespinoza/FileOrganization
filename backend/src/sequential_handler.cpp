@@ -2,75 +2,225 @@
 #include <cpprest/json.h>
 #include <cpprest/uri.h>
 #include "../include/sequential_file.h"
-#include "../include/record_sequential.h"
+#include "../include/employee_sequential.h"
+#include "../include/game_sequential.h"
+#include "../include/utils.h"
 
 using namespace web;
 using namespace http;
 
 class SequentialHandler {
 public:
+
     void get_all(http_request request, const uri& uri) {
         auto query = uri::split_query(uri.query());
-        if (query.find(U("filename")) != query.end()) {
-            std::string filename = utility::conversions::to_utf8string(query[U("filename")]);
+        if (query.find(U("table_name")) != query.end()) {
+            std::string table_name = utility::conversions::to_utf8string(query[U("table_name")]);
+            if(table_name == "employee"){
+              SequentialFile<int, EmployeeRecordSequential> seqFile(table_name+"_seq.dat", table_name+"_aux_seq.dat");
+              auto inorderResult = seqFile.get_all();
 
-            SequentialFile<int, Record_S> seqFile(filename, "auxfile.dat");
-            auto inorderResult = seqFile.get_all();
-
-            json::value response_data = json::value::array();
-            for (size_t i = 0; i < inorderResult.size(); ++i) {
-                json::value recordJson;
-                recordJson[U("key")] = json::value::number(inorderResult[i].key);
-                recordJson[U("data")] = json::value::string(utility::conversions::to_string_t(inorderResult[i].data));
-                response_data[i] = recordJson;
+              json::value response_data = json::value::array();
+              for (size_t i = 0; i < inorderResult.size(); ++i) {
+                  json::value recordJson;
+                  recordJson[U("key")] = web::json::value::number(inorderResult[i].key);
+                  recordJson[U("FirstName")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].FirstName));
+                  recordJson[U("LastName")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].LastName));
+                  recordJson[U("StartDate")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].StartDate));
+                  recordJson[U("ExitDate")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].ExitDate));
+                  recordJson[U("Title")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].Title));
+                  recordJson[U("Supervisor")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].Supervisor));
+                  recordJson[U("ADEmail")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].ADEmail));
+                  recordJson[U("BusinessUnit")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].BusinessUnit));
+                  recordJson[U("EmployeeStatus")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].EmployeeStatus));
+                  recordJson[U("EmployeeType")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].EmployeeType));
+                  recordJson[U("PayZone")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].PayZone));
+                  recordJson[U("EmployeeClassificationType")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].EmployeeClassificationType));
+                  recordJson[U("TerminationType")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].TerminationType));
+                  recordJson[U("TerminationDescription")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].TerminationDescription));
+                  recordJson[U("DepartmentType")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].DepartmentType));
+                  recordJson[U("Division")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].Division));
+                  recordJson[U("DOB")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].DOB));
+                  recordJson[U("State")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].State));
+                  recordJson[U("JobFunctionDescription")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].JobFunctionDescription));
+                  recordJson[U("GenderCode")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].GenderCode));
+                  recordJson[U("LocationCode")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].LocationCode));
+                  recordJson[U("RaceDesc")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].RaceDesc));
+                  recordJson[U("MaritalDesc")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].MaritalDesc));
+                  recordJson[U("PerformanceScore")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].PerformanceScore));
+                  recordJson[U("CurrentEmployeeRating")] = web::json::value::number(inorderResult[i].CurrentEmployeeRating);
+                  response_data[i] = recordJson;
+              }
+              request.reply(status_codes::OK, response_data);
             }
-            request.reply(status_codes::OK, response_data);
+            if(table_name == "game"){
+              SequentialFile<int, GameRecordSequential> seqFile(table_name+"_seq.dat", table_name+"_aux_seq.dat");
+              auto inorderResult = seqFile.get_all();
+              json::value response_data = json::value::array();
+              for (size_t i = 0; i < inorderResult.size(); ++i) {
+                  json::value recordJson;
+                  recordJson[U("key")] = web::json::value::number(inorderResult[i].key);
+                  recordJson[U("Rank")] = web::json::value::number(inorderResult[i].Rank);
+                  recordJson[U("GameTitle")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].GameTitle));
+                  recordJson[U("Platform")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].Platform));
+                  recordJson[U("Year")] = web::json::value::number(inorderResult[i].Year);
+                  recordJson[U("Genre")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].Genre));
+                  recordJson[U("Publisher")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].Publisher));
+                  recordJson[U("NorthAmerica")] = web::json::value::number(inorderResult[i].NorthAmerica);
+                  recordJson[U("Europe")] = web::json::value::number(inorderResult[i].Europe);
+                  recordJson[U("Japan")] = web::json::value::number(inorderResult[i].Japan);
+                  recordJson[U("RestOfWorld")] = web::json::value::number(inorderResult[i].RestOfWorld);
+                  recordJson[U("Global")] = web::json::value::number(inorderResult[i].Global);
+                  recordJson[U("Review")] = web::json::value::number(inorderResult[i].Review);
+                  response_data[i] = recordJson;
+              }
+              request.reply(status_codes::OK, response_data);
+            }
         } else {
             request.reply(status_codes::BadRequest, U("Filename parameter is required."));
         }
     }
 
+    
     void get_record(http_request request, const uri& uri) {
         auto query = uri::split_query(uri.query());
-        if (query.find(U("key")) != query.end() && query.find(U("filename")) != query.end()) {
+        if (query.find(U("key")) != query.end() && query.find(U("table_name")) != query.end()) {
             int key = std::stoi(utility::conversions::to_utf8string(query[U("key")]));
-            std::string filename = utility::conversions::to_utf8string(query[U("filename")]);
+            std::string table_name = utility::conversions::to_utf8string(query[U("table_name")]);
+            if (table_name == "employee"){
+              SequentialFile<int, EmployeeRecordSequential> seqFile(table_name+"_seq.dat", table_name+"_aux_seq.dat");
+              EmployeeRecordSequential record = seqFile.search_by_key(key);
 
-            SequentialFile<int, Record_S> seqFile(filename, "auxfile.dat");
-            Record_S record = seqFile.search_by_key(key);
-
-            if (record.key != -1) { // Asumiendo que -1 significa "no encontrado"
-                json::value recordJson;
-                recordJson[U("key")] = json::value::number(record.key);
-                recordJson[U("data")] = json::value::string(utility::conversions::to_string_t(record.data));
-
-                request.reply(status_codes::OK, recordJson);
-            } else {
-                request.reply(status_codes::NotFound, U("Record not found."));
+              if (record.key != 1) {
+                  json::value recordJson;
+                  recordJson[U("key")] = web::json::value::number(record.key);
+                  recordJson[U("FirstName")] = web::json::value::string(utility::conversions::to_string_t(record.FirstName));
+                  recordJson[U("LastName")] = web::json::value::string(utility::conversions::to_string_t(record.LastName));
+                  recordJson[U("StartDate")] = web::json::value::string(utility::conversions::to_string_t(record.StartDate));
+                  recordJson[U("ExitDate")] = web::json::value::string(utility::conversions::to_string_t(record.ExitDate));
+                  recordJson[U("Title")] = web::json::value::string(utility::conversions::to_string_t(record.Title));
+                  recordJson[U("Supervisor")] = web::json::value::string(utility::conversions::to_string_t(record.Supervisor));
+                  recordJson[U("ADEmail")] = web::json::value::string(utility::conversions::to_string_t(record.ADEmail));
+                  recordJson[U("BusinessUnit")] = web::json::value::string(utility::conversions::to_string_t(record.BusinessUnit));
+                  recordJson[U("EmployeeStatus")] = web::json::value::string(utility::conversions::to_string_t(record.EmployeeStatus));
+                  recordJson[U("EmployeeType")] = web::json::value::string(utility::conversions::to_string_t(record.EmployeeType));
+                  recordJson[U("PayZone")] = web::json::value::string(utility::conversions::to_string_t(record.PayZone));
+                  recordJson[U("EmployeeClassificationType")] = web::json::value::string(utility::conversions::to_string_t(record.EmployeeClassificationType));
+                  recordJson[U("TerminationType")] = web::json::value::string(utility::conversions::to_string_t(record.TerminationType));
+                  recordJson[U("TerminationDescription")] = web::json::value::string(utility::conversions::to_string_t(record.TerminationDescription));
+                  recordJson[U("DepartmentType")] = web::json::value::string(utility::conversions::to_string_t(record.DepartmentType));
+                  recordJson[U("Division")] = web::json::value::string(utility::conversions::to_string_t(record.Division));
+                  recordJson[U("DOB")] = web::json::value::string(utility::conversions::to_string_t(record.DOB));
+                  recordJson[U("State")] = web::json::value::string(utility::conversions::to_string_t(record.State));
+                  recordJson[U("JobFunctionDescription")] = web::json::value::string(utility::conversions::to_string_t(record.JobFunctionDescription));
+                  recordJson[U("GenderCode")] = web::json::value::string(utility::conversions::to_string_t(record.GenderCode));
+                  recordJson[U("LocationCode")] = web::json::value::string(utility::conversions::to_string_t(record.LocationCode));
+                  recordJson[U("RaceDesc")] = web::json::value::string(utility::conversions::to_string_t(record.RaceDesc));
+                  recordJson[U("MaritalDesc")] = web::json::value::string(utility::conversions::to_string_t(record.MaritalDesc));
+                  recordJson[U("PerformanceScore")] = web::json::value::string(utility::conversions::to_string_t(record.PerformanceScore));
+                  recordJson[U("CurrentEmployeeRating")] = web::json::value::number(record.CurrentEmployeeRating);
+                  request.reply(status_codes::OK, recordJson);
+              } else {
+                  request.reply(status_codes::NotFound, U("Record not found."));
+              }
             }
+            if (table_name == "game"){
+              SequentialFile<int, GameRecordSequential> seqFile(table_name+"_seq.dat", table_name+"_aux_seq.dat");
+              GameRecordSequential record = seqFile.search_by_key(key);
+              if (record.key != -1) {
+                  json::value recordJson;
+                  recordJson[U("key")] = web::json::value::number(record.key);
+                  recordJson[U("Rank")] = web::json::value::number(record.Rank);
+                  recordJson[U("GameTitle")] = web::json::value::string(utility::conversions::to_string_t(record.GameTitle));
+                  recordJson[U("Platform")] = web::json::value::string(utility::conversions::to_string_t(record.Platform));
+                  recordJson[U("Year")] = web::json::value::number(record.Year);
+                  recordJson[U("Genre")] = web::json::value::string(utility::conversions::to_string_t(record.Genre));
+                  recordJson[U("Publisher")] = web::json::value::string(utility::conversions::to_string_t(record.Publisher));
+                  recordJson[U("NorthAmerica")] = web::json::value::number(record.NorthAmerica);
+                  recordJson[U("Europe")] = web::json::value::number(record.Europe);
+                  recordJson[U("Japan")] = web::json::value::number(record.Japan);
+                  recordJson[U("RestOfWorld")] = web::json::value::number(record.RestOfWorld);
+                  recordJson[U("Global")] = web::json::value::number(record.Global);
+                  recordJson[U("Review")] = web::json::value::number(record.Review);
+                  request.reply(status_codes::OK, recordJson);
+              } else {
+                  request.reply(status_codes::NotFound, U("Record not found."));
+              }
+            }
+
         } else {
             request.reply(status_codes::BadRequest, U("Key and filename parameters are required."));
         }
     }
 
+    
     void get_between(http_request request, const uri& uri) {
         auto query = uri::split_query(uri.query());
-        if (query.find(U("start")) != query.end() && query.find(U("end")) != query.end() && query.find(U("filename")) != query.end()) {
+        if (query.find(U("start")) != query.end() && query.find(U("end")) != query.end() && query.find(U("table_name")) != query.end()) {
             int start = std::stoi(utility::conversions::to_utf8string(query[U("start")]));
             int end = std::stoi(utility::conversions::to_utf8string(query[U("end")]));
-            std::string filename = utility::conversions::to_utf8string(query[U("filename")]);
+            std::string table_name = utility::conversions::to_utf8string(query[U("table_name")]);
 
-            SequentialFile<int, Record_S> seqFile(filename, "auxfile.dat");
-            std::vector<Record_S> rangeResult = seqFile.get_between(start, end);
+            if (table_name == "employee"){
+                SequentialFile<int, EmployeeRecordSequential> seqFile(table_name+"_seq.dat", table_name+"_aux_seq.dat");
+                auto rangeResult = seqFile.get_between(start, end);
 
-            json::value response_data = json::value::array();
-            for (size_t i = 0; i < rangeResult.size(); ++i) {
-                json::value recordJson;
-                recordJson[U("key")] = json::value::number(rangeResult[i].key);
-                recordJson[U("data")] = json::value::string(utility::conversions::to_string_t(rangeResult[i].data));
-                response_data[i] = recordJson;
-            }
-            request.reply(status_codes::OK, response_data);
+                json::value response_data = json::value::array();
+                for (size_t i = 0; i < rangeResult.size(); ++i) {
+                    json::value recordJson;
+                    recordJson[U("key")] = web::json::value::number(rangeResult[i].key);
+                    recordJson[U("FirstName")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].FirstName));
+                    recordJson[U("LastName")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].LastName));
+                    recordJson[U("StartDate")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].StartDate));
+                    recordJson[U("ExitDate")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].ExitDate));
+                    recordJson[U("Title")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].Title));
+                    recordJson[U("Supervisor")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].Supervisor));
+                    recordJson[U("ADEmail")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].ADEmail));
+                    recordJson[U("BusinessUnit")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].BusinessUnit));
+                    recordJson[U("EmployeeStatus")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].EmployeeStatus));
+                    recordJson[U("EmployeeType")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].EmployeeType));
+                    recordJson[U("PayZone")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].PayZone));
+                    recordJson[U("EmployeeClassificationType")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].EmployeeClassificationType));
+                    recordJson[U("TerminationType")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].TerminationType));
+                    recordJson[U("TerminationDescription")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].TerminationDescription));
+                    recordJson[U("DepartmentType")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].DepartmentType));
+                    recordJson[U("Division")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].Division));
+                    recordJson[U("DOB")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].DOB));
+                    recordJson[U("State")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].State));
+                    recordJson[U("JobFunctionDescription")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].JobFunctionDescription));
+                    recordJson[U("GenderCode")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].GenderCode));
+                    recordJson[U("LocationCode")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].LocationCode));
+                    recordJson[U("RaceDesc")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].RaceDesc));
+                    recordJson[U("MaritalDesc")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].MaritalDesc));
+                    recordJson[U("PerformanceScore")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].PerformanceScore));
+                    recordJson[U("CurrentEmployeeRating")] = web::json::value::number(rangeResult[i].CurrentEmployeeRating);
+                    response_data[i] = recordJson;
+                }
+                request.reply(status_codes::OK, response_data);
+            } if(table_name == "game"){
+                SequentialFile<int, GameRecordSequential> seqFile(table_name+"_seq.dat", table_name+"_aux_seq.dat");
+                auto rangeResult = seqFile.get_between(start, end);
+
+                json::value response_data = json::value::array();
+                for (size_t i = 0; i < rangeResult.size(); ++i) {
+                    json::value recordJson;
+                    recordJson[U("key")] = web::json::value::number(rangeResult[i].key);
+                    recordJson[U("Rank")] = web::json::value::number(rangeResult[i].Rank);
+                    recordJson[U("GameTitle")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].GameTitle));
+                    recordJson[U("Platform")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].Platform));
+                    recordJson[U("Year")] = web::json::value::number(rangeResult[i].Year);
+                    recordJson[U("Genre")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].Genre));
+                    recordJson[U("Publisher")] = web::json::value::string(utility::conversions::to_string_t(rangeResult[i].Publisher));
+                    recordJson[U("NorthAmerica")] = web::json::value::number(rangeResult[i].NorthAmerica);
+                    recordJson[U("Europe")] = web::json::value::number(rangeResult[i].Europe);
+                    recordJson[U("Japan")] = web::json::value::number(rangeResult[i].Japan);
+                    recordJson[U("RestOfWorld")] = web::json::value::number(rangeResult[i].RestOfWorld);
+                    recordJson[U("Global")] = web::json::value::number(rangeResult[i].Global);
+                    recordJson[U("Review")] = web::json::value::number(rangeResult[i].Review);
+                    response_data[i] = recordJson;
+                }
+                request.reply(status_codes::OK, response_data);
+          }
         } else {
             request.reply(status_codes::BadRequest, U("Start, end, and filename parameters are required."));
         }
@@ -78,37 +228,282 @@ public:
 
     void post_record(http_request request, const uri& uri) {
         auto query = uri::split_query(uri.query());
-        if (query.find(U("filename")) != query.end()) {
-            std::string filename = utility::conversions::to_utf8string(query[U("filename")]);
+        if (query.find(U("table_name")) != query.end()) {
+            std::string table_name = utility::conversions::to_utf8string(query[U("table_name")]);
+            if(table_name == "employee"){
+                request.extract_json().then([=](json::value request_data) {
+                if (request_data.has_field(U("key")) && 
+                    request_data.has_field(U("FirstName")) && 
+                    request_data.has_field(U("LastName")) && 
+                    request_data.has_field(U("StartDate")) && 
+                    request_data.has_field(U("ExitDate")) && 
+                    request_data.has_field(U("Title")) && 
+                    request_data.has_field(U("Supervisor")) && 
+                    request_data.has_field(U("ADEmail")) && 
+                    request_data.has_field(U("BusinessUnit")) && 
+                    request_data.has_field(U("EmployeeStatus")) && 
+                    request_data.has_field(U("EmployeeType")) && 
+                    request_data.has_field(U("PayZone")) && 
+                    request_data.has_field(U("EmployeeClassificationType")) && 
+                    request_data.has_field(U("TerminationType")) && 
+                    request_data.has_field(U("TerminationDescription")) && 
+                    request_data.has_field(U("DepartmentType")) && 
+                    request_data.has_field(U("Division")) && 
+                    request_data.has_field(U("DOB")) && 
+                    request_data.has_field(U("State")) && 
+                    request_data.has_field(U("JobFunctionDescription")) && 
+                    request_data.has_field(U("GenderCode")) && 
+                    request_data.has_field(U("LocationCode")) && 
+                    request_data.has_field(U("RaceDesc")) && 
+                    request_data.has_field(U("MaritalDesc")) && 
+                    request_data.has_field(U("PerformanceScore")) && 
+                    request_data.has_field(U("CurrentEmployeeRating"))) {
+                    EmployeeRecordSequential record;
+                    record.key = request_data[U("key")].as_integer();
+                    strncpy(record.FirstName, utility::conversions::to_utf8string(request_data[U("FirstName")].as_string()).c_str(), sizeof(record.FirstName) - 1);
+                    record.FirstName[sizeof(record.FirstName) - 1] = '\0'; 
+                    strncpy(record.LastName, utility::conversions::to_utf8string(request_data[U("LastName")].as_string()).c_str(), sizeof(record.LastName) - 1);
+                    record.LastName[sizeof(record.LastName) - 1] = '\0';
+                    strncpy(record.StartDate, utility::conversions::to_utf8string(request_data[U("StartDate")].as_string()).c_str(), sizeof(record.StartDate) - 1);
+                    record.StartDate[sizeof(record.StartDate) - 1] = '\0';
+                    strncpy(record.ExitDate, utility::conversions::to_utf8string(request_data[U("ExitDate")].as_string()).c_str(), sizeof(record.ExitDate) - 1);
+                    record.ExitDate[sizeof(record.ExitDate) - 1] = '\0';
+                    strncpy(record.Title, utility::conversions::to_utf8string(request_data[U("Title")].as_string()).c_str(), sizeof(record.Title) - 1);
+                    record.Title[sizeof(record.Title) - 1] = '\0';
+                    strncpy(record.Supervisor, utility::conversions::to_utf8string(request_data[U("Supervisor")].as_string()).c_str(), sizeof(record.Supervisor) - 1);
+                    record.Supervisor[sizeof(record.Supervisor) - 1] = '\0';
+                    strncpy(record.ADEmail, utility::conversions::to_utf8string(request_data[U("ADEmail")].as_string()).c_str(), sizeof(record.ADEmail) - 1);
+                    record.ADEmail[sizeof(record.ADEmail) - 1] = '\0';
+                    strncpy(record.BusinessUnit, utility::conversions::to_utf8string(request_data[U("BusinessUnit")].as_string()).c_str(), sizeof(record.BusinessUnit) - 1);
+                    record.BusinessUnit[sizeof(record.BusinessUnit) - 1] = '\0';
+                    strncpy(record.EmployeeStatus, utility::conversions::to_utf8string(request_data[U("EmployeeStatus")].as_string()).c_str(), sizeof(record.EmployeeStatus) - 1);
+                    record.EmployeeStatus[sizeof(record.EmployeeStatus) - 1] = '\0';
+                    strncpy(record.EmployeeType, utility::conversions::to_utf8string(request_data[U("EmployeeType")].as_string()).c_str(), sizeof(record.EmployeeType) - 1);
+                    record.EmployeeType[sizeof(record.EmployeeType) - 1] = '\0';
+                    strncpy(record.PayZone, utility::conversions::to_utf8string(request_data[U("PayZone")].as_string()).c_str(), sizeof(record.PayZone) - 1);
+                    record.PayZone[sizeof(record.PayZone) - 1] = '\0';
+                    strncpy(record.EmployeeClassificationType, utility::conversions::to_utf8string(request_data[U("EmployeeClassificationType")].as_string()).c_str(), sizeof(record.EmployeeClassificationType) - 1);
+                    record.EmployeeClassificationType[sizeof(record.EmployeeClassificationType) - 1] = '\0';
+                    strncpy(record.TerminationType, utility::conversions::to_utf8string(request_data[U("TerminationType")].as_string()).c_str(), sizeof(record.TerminationType) - 1);
+                    record.TerminationType[sizeof(record.TerminationType) - 1] = '\0';
+                    strncpy(record.TerminationDescription, utility::conversions::to_utf8string(request_data[U("TerminationDescription")].as_string()).c_str(), sizeof(record.TerminationDescription) - 1);
+                    record.TerminationDescription[sizeof(record.TerminationDescription) - 1] = '\0';
+                    strncpy(record.DepartmentType, utility::conversions::to_utf8string(request_data[U("DepartmentType")].as_string()).c_str(), sizeof(record.DepartmentType) - 1);
+                    record.DepartmentType[sizeof(record.DepartmentType) - 1] = '\0';
+                    strncpy(record.Division, utility::conversions::to_utf8string(request_data[U("Division")].as_string()).c_str(), sizeof(record.Division) - 1);
+                    record.Division[sizeof(record.Division) - 1] = '\0';
+                    strncpy(record.DOB, utility::conversions::to_utf8string(request_data[U("DOB")].as_string()).c_str(), sizeof(record.DOB) - 1);
+                    record.DOB[sizeof(record.DOB) - 1] = '\0';
+                    strncpy(record.State, utility::conversions::to_utf8string(request_data[U("State")].as_string()).c_str(), sizeof(record.State) - 1);
+                    record.State[sizeof(record.State) - 1] = '\0';
+                    strncpy(record.JobFunctionDescription, utility::conversions::to_utf8string(request_data[U("JobFunctionDescription")].as_string()).c_str(), sizeof(record.JobFunctionDescription) - 1);
+                    record.JobFunctionDescription[sizeof(record.JobFunctionDescription) - 1] = '\0';
+                    strncpy(record.GenderCode, utility::conversions::to_utf8string(request_data[U("GenderCode")].as_string()).c_str(), sizeof(record.GenderCode) - 1);
+                    record.GenderCode[sizeof(record.GenderCode) - 1] = '\0';
+                    strncpy(record.LocationCode, utility::conversions::to_utf8string(request_data[U("LocationCode")].as_string()).c_str(), sizeof(record.LocationCode) - 1);
+                    record.LocationCode[sizeof(record.LocationCode) - 1] = '\0';
+                    strncpy(record.RaceDesc, utility::conversions::to_utf8string(request_data[U("RaceDesc")].as_string()).c_str(), sizeof(record.RaceDesc) - 1);
+                    record.RaceDesc[sizeof(record.RaceDesc) - 1] = '\0';
+                    strncpy(record.MaritalDesc, utility::conversions::to_utf8string(request_data[U("MaritalDesc")].as_string()).c_str(), sizeof(record.MaritalDesc) - 1);
+                    record.MaritalDesc[sizeof(record.MaritalDesc) - 1] = '\0';
+                    strncpy(record.PerformanceScore, utility::conversions::to_utf8string(request_data[U("PerformanceScore")].as_string()).c_str(), sizeof(record.PerformanceScore) - 1);
+                    record.PerformanceScore[sizeof(record.PerformanceScore) - 1] = '\0';
+                    record.CurrentEmployeeRating = request_data[U("CurrentEmployeeRating")].as_double();
 
-            request.extract_json().then([=](json::value request_data) {
-                if (request_data.has_field(U("key")) && request_data.has_field(U("data"))) {
-                    Record_S record(
-                        request_data[U("key")].as_integer(),
-                        utility::conversions::to_utf8string(request_data[U("data")].as_string()).c_str()
-                    );
-
-                    SequentialFile<int, Record_S> seqFile(filename, "auxfile.dat");
+                    SequentialFile<int, EmployeeRecordSequential> seqFile(table_name+"_seq.dat", table_name+"_aux_seq.dat");
                     seqFile.insertIntoAuxFile(record);
                     request.reply(status_codes::OK, U("Record added successfully."));
                 } else {
                     request.reply(status_codes::BadRequest, U("Invalid record format."));
                 }
-            }).wait();
+              }).wait();
+            }
+            if(table_name == "game"){
+                request.extract_json().then([=](json::value request_data) {
+                if (request_data.has_field(U("key")) && 
+                    request_data.has_field(U("Rank")) && 
+                    request_data.has_field(U("GameTitle")) && 
+                    request_data.has_field(U("Platform")) && 
+                    request_data.has_field(U("Year")) && 
+                    request_data.has_field(U("Genre")) && 
+                    request_data.has_field(U("Publisher")) && 
+                    request_data.has_field(U("NorthAmerica")) && 
+                    request_data.has_field(U("Europe")) && 
+                    request_data.has_field(U("Japan")) && 
+                    request_data.has_field(U("RestOfWorld")) && 
+                    request_data.has_field(U("Global")) && 
+                    request_data.has_field(U("Review"))) {
+
+                    GameRecordSequential record;
+                    record.key = request_data[U("key")].as_integer();
+                    record.Rank = request_data[U("Rank")].as_integer();
+                    strncpy(record.GameTitle, utility::conversions::to_utf8string(request_data[U("GameTitle")].as_string()).c_str(), sizeof(record.GameTitle) - 1);
+                    record.GameTitle[sizeof(record.GameTitle) - 1] = '\0';
+                    strncpy(record.Platform, utility::conversions::to_utf8string(request_data[U("Platform")].as_string()).c_str(), sizeof(record.Platform) - 1); 
+                    record.Platform[sizeof(record.Platform) - 1] = '\0';
+                    record.Year = request_data[U("Year")].as_integer();
+                    strncpy(record.Genre, utility::conversions::to_utf8string(request_data[U("Genre")].as_string()).c_str(), sizeof(record.Genre) - 1); 
+                    record.Genre[sizeof(record.Genre) - 1] = '\0';
+                    strncpy(record.Publisher, utility::conversions::to_utf8string(request_data[U("Publisher")].as_string()).c_str(), sizeof(record.Publisher) - 1); 
+                    record.Publisher[sizeof(record.Publisher) - 1] = '\0';
+                    record.NorthAmerica = request_data[U("NorthAmerica")].as_double();
+                    record.Europe = request_data[U("Europe")].as_double();
+                    record.Japan = request_data[U("Japan")].as_double();
+                    record.RestOfWorld = request_data[U("RestOfWorld")].as_double();
+                    record.Global = request_data[U("Global")].as_double();
+                    record.Review = request_data[U("Review")].as_double();
+
+                    SequentialFile<int, GameRecordSequential> seqFile(table_name+"_seq.dat", table_name+"_aux_seq.dat");
+                    seqFile.insertIntoAuxFile(record);
+                    request.reply(status_codes::OK, U("Record added successfully."));
+                } else {
+                    request.reply(status_codes::BadRequest, U("Invalid record format."));
+                }
+              }).wait();
+            }
         } else {
             request.reply(status_codes::BadRequest, U("Filename parameter is required."));
+        }
+    }
+    
+    
+    void post_csv(http_request request, const uri& uri) {
+        auto query = uri::split_query(uri.query());
+        if (query.find(U("table_name")) != query.end()) {
+            std::string table_name = utility::conversions::to_utf8string(query[U("table_name")]);
+
+            request.extract_json().then([=](json::value request_data) {
+                if (request_data.has_field(U("csv_path"))) {
+                    std::string csv_path = utility::conversions::to_utf8string(request_data[U("csv_path")].as_string());
+
+                    try {
+                        if (table_name == "employee") {
+                            SequentialFile<int, EmployeeRecordSequential> seqFile(table_name+"_seq.dat", table_name+"_aux_seq.dat");
+                            std::ifstream file(csv_path);
+                            if (!file.is_open()) {
+                                throw std::runtime_error("Error al abrir el archivo CSV.");
+                            }
+
+                            std::string line;
+                            // Ignorar el encabezado
+                            std::getline(file, line);
+                            
+                            while (std::getline(file, line)) {
+                                try {
+                                    std::vector<std::string> fields = split(line);
+                                    if (fields.size() < 20) { // Asegúrate de que haya suficientes campos
+                                        std::cerr << "Error: Línea con menos de 20 campos." << std::endl;
+                                        continue; // Saltar líneas con errores
+                                    }
+
+                                    EmployeeRecordSequential record;
+                                    record.key = std::stoi(fields[0]);
+                                    strcpy(record.FirstName, fields[1].c_str());
+                                    strcpy(record.LastName, fields[2].c_str());
+                                    strcpy(record.StartDate, fields[3].c_str());
+                                    strcpy(record.ExitDate, fields[4].c_str());
+                                    strcpy(record.Title, fields[5].c_str());
+                                    strcpy(record.Supervisor, fields[6].c_str());
+                                    strcpy(record.ADEmail, fields[7].c_str());
+                                    strcpy(record.BusinessUnit, fields[8].c_str());
+                                    strcpy(record.EmployeeStatus, fields[9].c_str());
+                                    strcpy(record.EmployeeType, fields[10].c_str());
+                                    strcpy(record.PayZone, fields[11].c_str());
+                                    strcpy(record.EmployeeClassificationType, fields[12].c_str());
+                                    strcpy(record.TerminationType, fields[13].c_str());
+                                    strcpy(record.TerminationDescription, fields[14].c_str());
+                                    strcpy(record.DepartmentType, fields[15].c_str());
+                                    strcpy(record.Division, fields[16].c_str());
+                                    strcpy(record.DOB, fields[17].c_str());
+                                    strcpy(record.State, fields[18].c_str());
+                                    strcpy(record.JobFunctionDescription, fields[19].c_str());
+                                    strcpy(record.GenderCode, fields[20].c_str());
+                                    strcpy(record.LocationCode, fields[21].c_str());
+                                    strcpy(record.RaceDesc, fields[22].c_str());
+                                    strcpy(record.MaritalDesc, fields[23].c_str());
+                                    strcpy(record.PerformanceScore, fields[24].c_str());
+                                    record.CurrentEmployeeRating = std::stod(fields[25]);
+
+                                    seqFile.insertIntoAuxFile(record);
+                                } catch (const std::exception &e) {
+                                    std::cerr << "Error al procesar la línea: " << line << " - " << e.what() << std::endl;
+                                    continue; // Continuar con la siguiente línea
+                                }
+                            }
+                            std::cout << "End Reading" << std::endl;
+                            file.close();
+                            request.reply(status_codes::OK, U("CSV loaded."));
+                        } else if (table_name == "game") {
+                            SequentialFile<int, GameRecordSequential> seqFile(table_name+"_seq.dat", table_name+"_aux_seq.dat");
+                            std::ifstream file(csv_path);
+                            if (!file.is_open()) {
+                                throw std::runtime_error("Error al abrir el archivo CSV.");
+                            }
+
+                            std::string line;
+                            std::getline(file, line); // Ignorar el encabezado
+                            
+                            while (std::getline(file, line)) {
+                                try {
+                                    std::vector<std::string> fields = split(line);
+                                    if (fields.size() < 13) {
+                                        std::cerr << "Error: Línea con menos de 13 campos." << std::endl;
+                                        continue; // Saltar líneas con errores
+                                    }
+
+                                    GameRecordSequential record;
+                                    record.key = std::stoi(fields[0]);
+                                    record.Rank = std::stoi(fields[1]);
+                                    strcpy(record.GameTitle, fields[2].c_str());
+                                    strcpy(record.Platform, fields[3].c_str());
+                                    record.Year = static_cast<int>(std::stod(fields[4]));
+                                    strcpy(record.Genre, fields[5].c_str());
+                                    strcpy(record.Publisher, fields[6].c_str());
+                                    record.NorthAmerica = std::stod(fields[7]);
+                                    record.Europe = std::stod(fields[8]);
+                                    record.Japan = std::stod(fields[9]);
+                                    record.RestOfWorld = std::stod(fields[10]);
+                                    record.Global = std::stod(fields[11]);
+                                    record.Review = std::stod(fields[12]);
+
+                                    seqFile.insertIntoAuxFile(record);
+                                } catch (const std::exception &e) {
+                                    std::cerr << "Error al procesar la línea: " << line << " - " << e.what() << std::endl;
+                                    continue; // Continuar con la siguiente línea
+                                }
+                            }
+                            file.close();
+                            request.reply(status_codes::OK, U("CSV loaded."));
+                        } else {
+                            request.reply(status_codes::BadRequest, U("Invalid table name."));
+                        }
+                    } catch (const std::exception &e) {
+                        request.reply(status_codes::BadRequest, utility::conversions::to_string_t(e.what()));
+                    }
+                } else {
+                    request.reply(status_codes::BadRequest, U("Missing csv_path."));
+                }
+            }).wait(); // Espera a que la tarea asíncrona se complete
+        } else {
+            request.reply(status_codes::BadRequest, U("Missing table_name."));
         }
     }
 
     void delete_record(http_request request, const uri& uri) {
         auto query = uri::split_query(uri.query());
-        if (query.find(U("key")) != query.end() && query.find(U("filename")) != query.end()) {
+        if (query.find(U("key")) != query.end() && query.find(U("table_name")) != query.end()) {
             int key = std::stoi(utility::conversions::to_utf8string(query[U("key")]));
-            std::string filename = utility::conversions::to_utf8string(query[U("filename")]);
+            std::string table_name = utility::conversions::to_utf8string(query[U("table_name")]);
 
-            SequentialFile<int, Record_S> seqFile(filename, "auxfile.dat");
-            seqFile.delete_by_key(key);
-            request.reply(status_codes::OK, U("Record deleted successfully."));
+            if(table_name == "employee"){
+                SequentialFile<int, EmployeeRecordSequential> seqFile(table_name+"_seq.dat", table_name+"_aux_seq.dat");
+                seqFile.delete_by_key(key);
+                request.reply(status_codes::OK, U("Record deleted successfully."));
+            } if (table_name == "game"){
+                SequentialFile<int, GameRecordSequential> seqFile(table_name+"_seq.dat", table_name+"_aux_seq.dat");
+                seqFile.delete_by_key(key);
+                request.reply(status_codes::OK, U("Record deleted successfully."));
+            }
         } else {
             request.reply(status_codes::BadRequest, U("Key and filename parameters are required."));
         }

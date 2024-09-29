@@ -858,4 +858,5 @@ CMakeFiles/backend_bd.dir/src/main.cpp.o: \
  /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/src/../include/utils.h \
  /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/src/sequential_handler.cpp \
  /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/src/../include/sequential_file.h \
- /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/src/../include/record_sequential.h
+ /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/src/../include/employee_sequential.h \
+ /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/src/../include/game_sequential.h
