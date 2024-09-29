@@ -19,7 +19,7 @@ struct GameRecord {
     double Review;                    // Reseña
 
     // Constructor por defecto
-    GameRecord() : key(0), Rank(0), Year(0), NorthAmerica(0.0), Europe(0.0), 
+    GameRecord() : key(-1), Rank(0), Year(0), NorthAmerica(0.0), Europe(0.0), 
                    Japan(0.0), RestOfWorld(0.0), Global(0.0), Review(0.0) {}
 };
 

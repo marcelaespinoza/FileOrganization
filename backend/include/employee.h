@@ -32,7 +32,7 @@ struct EmployeeRecord {
     double CurrentEmployeeRating;          // Calificación actual del empleado
 
     // Constructor por defecto
-    EmployeeRecord() : key(0), CurrentEmployeeRating(0.0) {
+    EmployeeRecord() : key(-1), CurrentEmployeeRating(0.0) {
         // Inicializar los campos a cadenas vacías
         FirstName[0] = '\0';
         LastName[0] = '\0';

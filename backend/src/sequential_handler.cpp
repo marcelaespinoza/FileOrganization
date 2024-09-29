@@ -1,8 +1,8 @@
 #include <cpprest/http_listener.h>
 #include <cpprest/json.h>
 #include <cpprest/uri.h>
-#include "sequential_file.h"
-#include "record_sequential.h"
+#include "../include/sequential_file.h"
+#include "../include/record_sequential.h"
 
 using namespace web;
 using namespace http;
@@ -115,5 +115,4 @@ public:
     }
 };
 
-// No olvides registrar las rutas correspondientes en el servidor principal para utilizar este manejador.
 

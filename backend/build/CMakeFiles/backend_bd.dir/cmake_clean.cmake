@@ -1,6 +1,4 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/backend_bd.dir/src/avl.cpp.o"
-  "CMakeFiles/backend_bd.dir/src/avl.cpp.o.d"
   "CMakeFiles/backend_bd.dir/src/avl_handler.cpp.o"
   "CMakeFiles/backend_bd.dir/src/avl_handler.cpp.o.d"
   "CMakeFiles/backend_bd.dir/src/main.cpp.o"

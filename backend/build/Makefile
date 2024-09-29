@@ -129,30 +129,6 @@ backend_bd/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_bd.dir/build.make CMakeFiles/backend_bd.dir/build
 .PHONY : backend_bd/fast
 
-src/avl.o: src/avl.cpp.o
-.PHONY : src/avl.o
-
-# target to build an object file
-src/avl.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_bd.dir/build.make CMakeFiles/backend_bd.dir/src/avl.cpp.o
-.PHONY : src/avl.cpp.o
-
-src/avl.i: src/avl.cpp.i
-.PHONY : src/avl.i
-
-# target to preprocess a source file
-src/avl.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_bd.dir/build.make CMakeFiles/backend_bd.dir/src/avl.cpp.i
-.PHONY : src/avl.cpp.i
-
-src/avl.s: src/avl.cpp.s
-.PHONY : src/avl.s
-
-# target to generate assembly for a file
-src/avl.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_bd.dir/build.make CMakeFiles/backend_bd.dir/src/avl.cpp.s
-.PHONY : src/avl.cpp.s
-
 src/avl_handler.o: src/avl_handler.cpp.o
 .PHONY : src/avl_handler.o
 
@@ -234,9 +210,6 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... backend_bd"
-	@echo "... src/avl.o"
-	@echo "... src/avl.i"
-	@echo "... src/avl.s"
 	@echo "... src/avl_handler.o"
 	@echo "... src/avl_handler.i"
 	@echo "... src/avl_handler.s"

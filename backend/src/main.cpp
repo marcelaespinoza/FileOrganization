@@ -2,10 +2,23 @@
 #include <cpprest/uri.h>
 #include "avl_handler.cpp"      // Incluye el manejador AVL
 #include "sequential_handler.cpp" // Incluye el manejador secuencial
+#include "../include/utils.h" // Incluye el manejador secuencial
 
 using namespace web;
 using namespace http;
 using namespace http::experimental::listener;
+
+std::vector<std::string> split(const std::string &line) {
+    std::vector<std::string> fields;
+    std::stringstream ss(line);
+    std::string field;
+
+    while (std::getline(ss, field, ',')) {
+        fields.push_back(field);
+    }
+
+    return fields;
+}
 
 class Server_BD {
 public:
@@ -32,13 +45,24 @@ private:
     void handle_get(http_request request) {
         auto path = request.request_uri().path();
 
+        /*
+        //////////////////////////
+                AVL PATHS
+        /////////////////////////
+        */
         if (path.find(U("/avl/get_all")) == 0) {
             avlHandler.get_all(request, request.request_uri());
         } else if (path.find(U("/avl/get_record")) == 0) {
             avlHandler.get_record(request, request.request_uri());
         } else if (path.find(U("/avl/get_between")) == 0) {
             avlHandler.get_between(request, request.request_uri());
-        } else if (path.find(U("/sequential/get_all")) == 0) {
+        } 
+        /*
+        //////////////////////////
+                SEQUENTIAL PATHS
+        /////////////////////////
+        */
+        else if (path.find(U("/sequential/get_all")) == 0) {
             seqHandler.get_all(request, request.request_uri());
         } else if (path.find(U("/sequential/get_record")) == 0) {
             seqHandler.get_record(request, request.request_uri());
@@ -52,11 +76,27 @@ private:
     void handle_post(http_request request) {
         auto path = request.request_uri().path();
 
+        /*
+        //////////////////////////
+                AVL PATHS
+        /////////////////////////
+        */
         if (path.find(U("/avl/post_record")) == 0) {
             avlHandler.post_record(request, request.request_uri());
-        } else if (path.find(U("/sequential/post_record")) == 0) {
+        } else if(path.find(U("/avl/read_csv")) == 0){
+            avlHandler.post_csv(request, request.request_uri());
+        }  
+        /*
+        //////////////////////////
+                SEQUENTIAL PATHS
+        /////////////////////////
+        */
+        else if (path.find(U("/sequential/post_record")) == 0) {
             seqHandler.post_record(request, request.request_uri());
-        } else {
+        } else if(path.find(U("/sequential/read_csv")) == 0){
+
+        } 
+        else {
             request.reply(status_codes::NotFound, U("404 Not Found: Invalid path."));
         }
     }
@@ -64,9 +104,20 @@ private:
     void handle_delete(http_request request) {
         auto path = request.request_uri().path();
 
+        /*
+        //////////////////////////
+                AVL PATHS
+        /////////////////////////
+        */
         if (path.find(U("/avl/delete_record")) == 0) {
             avlHandler.delete_record(request, request.request_uri());
-        } else if (path.find(U("/sequential/delete_record")) == 0) {
+        } 
+        /*
+        //////////////////////////
+                SEQUENTIAL PATHS
+        /////////////////////////
+        */
+        else if (path.find(U("/sequential/delete_record")) == 0) {
             seqHandler.delete_record(request, request.request_uri());
         } else {
             request.reply(status_codes::NotFound, U("404 Not Found: Invalid path."));

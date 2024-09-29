@@ -83,24 +83,10 @@ CMakeFiles/backend_bd.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/backend_bd.dir/src/main.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/src/main.cpp -o CMakeFiles/backend_bd.dir/src/main.cpp.s
 
-CMakeFiles/backend_bd.dir/src/avl.cpp.o: CMakeFiles/backend_bd.dir/flags.make
-CMakeFiles/backend_bd.dir/src/avl.cpp.o: /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/src/avl.cpp
-CMakeFiles/backend_bd.dir/src/avl.cpp.o: CMakeFiles/backend_bd.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/backend_bd.dir/src/avl.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/backend_bd.dir/src/avl.cpp.o -MF CMakeFiles/backend_bd.dir/src/avl.cpp.o.d -o CMakeFiles/backend_bd.dir/src/avl.cpp.o -c /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/src/avl.cpp
-
-CMakeFiles/backend_bd.dir/src/avl.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/backend_bd.dir/src/avl.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/src/avl.cpp > CMakeFiles/backend_bd.dir/src/avl.cpp.i
-
-CMakeFiles/backend_bd.dir/src/avl.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/backend_bd.dir/src/avl.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/src/avl.cpp -o CMakeFiles/backend_bd.dir/src/avl.cpp.s
-
 CMakeFiles/backend_bd.dir/src/avl_handler.cpp.o: CMakeFiles/backend_bd.dir/flags.make
 CMakeFiles/backend_bd.dir/src/avl_handler.cpp.o: /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/src/avl_handler.cpp
 CMakeFiles/backend_bd.dir/src/avl_handler.cpp.o: CMakeFiles/backend_bd.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/backend_bd.dir/src/avl_handler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/backend_bd.dir/src/avl_handler.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/backend_bd.dir/src/avl_handler.cpp.o -MF CMakeFiles/backend_bd.dir/src/avl_handler.cpp.o.d -o CMakeFiles/backend_bd.dir/src/avl_handler.cpp.o -c /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/src/avl_handler.cpp
 
 CMakeFiles/backend_bd.dir/src/avl_handler.cpp.i: cmake_force
@@ -114,7 +100,7 @@ CMakeFiles/backend_bd.dir/src/avl_handler.cpp.s: cmake_force
 CMakeFiles/backend_bd.dir/src/sequential_handler.cpp.o: CMakeFiles/backend_bd.dir/flags.make
 CMakeFiles/backend_bd.dir/src/sequential_handler.cpp.o: /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/src/sequential_handler.cpp
 CMakeFiles/backend_bd.dir/src/sequential_handler.cpp.o: CMakeFiles/backend_bd.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/backend_bd.dir/src/sequential_handler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/backend_bd.dir/src/sequential_handler.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/backend_bd.dir/src/sequential_handler.cpp.o -MF CMakeFiles/backend_bd.dir/src/sequential_handler.cpp.o.d -o CMakeFiles/backend_bd.dir/src/sequential_handler.cpp.o -c /home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/src/sequential_handler.cpp
 
 CMakeFiles/backend_bd.dir/src/sequential_handler.cpp.i: cmake_force
@@ -128,7 +114,6 @@ CMakeFiles/backend_bd.dir/src/sequential_handler.cpp.s: cmake_force
 # Object files for target backend_bd
 backend_bd_OBJECTS = \
 "CMakeFiles/backend_bd.dir/src/main.cpp.o" \
-"CMakeFiles/backend_bd.dir/src/avl.cpp.o" \
 "CMakeFiles/backend_bd.dir/src/avl_handler.cpp.o" \
 "CMakeFiles/backend_bd.dir/src/sequential_handler.cpp.o"
 
@@ -136,14 +121,13 @@ backend_bd_OBJECTS = \
 backend_bd_EXTERNAL_OBJECTS =
 
 backend_bd: CMakeFiles/backend_bd.dir/src/main.cpp.o
-backend_bd: CMakeFiles/backend_bd.dir/src/avl.cpp.o
 backend_bd: CMakeFiles/backend_bd.dir/src/avl_handler.cpp.o
 backend_bd: CMakeFiles/backend_bd.dir/src/sequential_handler.cpp.o
 backend_bd: CMakeFiles/backend_bd.dir/build.make
 backend_bd: /usr/lib/libssl.so
 backend_bd: /usr/lib/libcrypto.so
 backend_bd: CMakeFiles/backend_bd.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable backend_bd"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/sebau12/Desktop/universidad/2024-2/Base_Datos2/registros/pruebas_pro/proyecto/backend/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable backend_bd"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/backend_bd.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
