@@ -27,8 +27,8 @@ def fetch_all_data(window):
         data = response.json().get("results", [])  # Actualización aquí
 
         end_time = time.time()
-        elapsed_time = end_time - start_time
-        window.time_label.setText(f"Datos cargados en {elapsed_time:.2f} segundos")
+        elapsed_time_ms = (end_time - start_time) * 1000  # Convertir a milisegundos
+        window.time_label.setText(f"Datos cargados en {elapsed_time_ms:.2f} ms")
 
         update_table(window)
 
@@ -42,6 +42,8 @@ def fetch_data_between(window):
     window.loading_label.setVisible(True)
     window.update()
 
+    start_time = time.time()
+
     try:
         table_name = window.table_combo.currentText()
         start = window.start_input.text()
@@ -52,7 +54,10 @@ def fetch_data_between(window):
         global data
         data = response.json().get("results", [])  # Actualización aquí
 
-        window.time_label.setText(f"Datos entre {start} y {end} cargados.")
+        end_time = time.time()
+        elapsed_time_ms = (end_time - start_time) * 1000  # Convertir a milisegundos
+        window.time_label.setText(f"Datos entre {start} y {end} cargados en {elapsed_time_ms:.2f} ms")
+
         update_table(window)
 
     except requests.exceptions.RequestException as e:
@@ -65,6 +70,8 @@ def fetch_record(window):
     window.loading_label.setVisible(True)
     window.update()
 
+    start_time = time.time()
+
     try:
         table_name = window.table_combo.currentText()
         key = window.key_input.text()
@@ -74,7 +81,10 @@ def fetch_record(window):
         global data
         data = [response.json().get("results", {})]  # Actualización aquí
 
-        window.time_label.setText(f"Registro con clave {key} cargado.")
+        end_time = time.time()
+        elapsed_time_ms = (end_time - start_time) * 1000  # Convertir a milisegundos
+        window.time_label.setText(f"Registro con clave {key} cargado en {elapsed_time_ms:.2f} ms")
+
         update_table(window)
 
     except requests.exceptions.RequestException as e:
@@ -86,6 +96,8 @@ def fetch_record(window):
 def insert_record(window):
     window.loading_label.setVisible(True)
     window.update()
+
+    start_time = time.time()
 
     try:
         # Obtener los valores de los campos de entrada
@@ -124,7 +136,9 @@ def insert_record(window):
         response = requests.post(f"http://localhost:8080/avl/post_record?table_name={table_name}", json=payload)
         response.raise_for_status()
 
-        window.time_label.setText(f"Registro insertado correctamente.")
+        end_time = time.time()
+        elapsed_time_ms = (end_time - start_time) * 1000  # Convertir a milisegundos
+        window.time_label.setText(f"Registro insertado correctamente en {elapsed_time_ms:.2f} ms")
 
     except requests.exceptions.RequestException as e:
         window.time_label.setText(f"Error al insertar el registro: {e}")
@@ -136,6 +150,8 @@ def remove_record(window):
     window.loading_label.setVisible(True)
     window.update()
 
+    start_time = time.time()
+
     try:
         key = window.remove_key_input.text()
         table_name = window.table_combo.currentText()
@@ -143,7 +159,9 @@ def remove_record(window):
         response = requests.delete(f"http://localhost:8080/avl/delete_record?table_name={table_name}&key={key}")
         response.raise_for_status()
 
-        window.time_label.setText(f"Registro con clave {key} eliminado correctamente.")
+        end_time = time.time()
+        elapsed_time_ms = (end_time - start_time) * 1000  # Convertir a milisegundos
+        window.time_label.setText(f"Registro con clave {key} eliminado correctamente en {elapsed_time_ms:.2f} ms")
 
     except requests.exceptions.RequestException as e:
         window.time_label.setText(f"Error al eliminar el registro: {e}")
@@ -155,6 +173,8 @@ def read_csv(window):
     window.loading_label.setVisible(True)
     window.update()
 
+    start_time = time.time()
+
     try:
         csv_path = window.csv_path_input.text()
         table_name = window.table_combo.currentText()
@@ -164,7 +184,9 @@ def read_csv(window):
         response = requests.post(f"http://localhost:8080/avl/read_csv?table_name={table_name}", json=payload)
         response.raise_for_status()
 
-        window.time_label.setText(f"Datos del CSV cargados en la tabla {table_name}.")
+        end_time = time.time()
+        elapsed_time_ms = (end_time - start_time) * 1000  # Convertir a milisegundos
+        window.time_label.setText(f"Datos del CSV cargados en {elapsed_time_ms:.2f} ms")
 
     except requests.exceptions.RequestException as e:
         window.time_label.setText(f"Error al leer el CSV: {e}")
