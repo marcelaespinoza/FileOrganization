@@ -176,13 +176,45 @@ def update_table(window):
     global current_page
     window.table.setRowCount(0)
 
+    # Obtener el nombre de la tabla seleccionada
+    table_name = window.table_combo.currentText()
+    
+    # Definir el tamaño de página
     start_index = current_page * page_size
     end_index = start_index + page_size
-    for row_index, item in enumerate(data[start_index:end_index]):
-        window.table.insertRow(row_index)
-        window.table.setItem(row_index, 0, QTableWidgetItem(str(item.get('key', ''))))
-        window.table.setItem(row_index, 1, QTableWidgetItem(item.get('GameTitle', '')))
-        window.table.setItem(row_index, 2, QTableWidgetItem(str(item.get('Year', ''))))
+
+    # Limpiar las columnas anteriores
+    window.table.clear()
+
+    if table_name == "game":
+        # Establecer columnas para "game"
+        window.table.setColumnCount(5)
+        window.table.setHorizontalHeaderLabels(["Index", "Rank", "Game Title", "Platform", "Year"])
+        
+        # Llenar la tabla con los datos
+        for row_index, item in enumerate(data[start_index:end_index]):
+            window.table.insertRow(row_index)
+            window.table.setItem(row_index, 0, QTableWidgetItem(str(item.get('key', ''))))
+            window.table.setItem(row_index, 1, QTableWidgetItem(str(item.get('Rank', ''))))
+            window.table.setItem(row_index, 2, QTableWidgetItem(item.get('GameTitle', '')))
+            window.table.setItem(row_index, 3, QTableWidgetItem(item.get('Platform', '')))
+            window.table.setItem(row_index, 4, QTableWidgetItem(str(item.get('Year', ''))))
+
+    elif table_name == "employee":
+        # Establecer columnas para "employee"
+        window.table.setColumnCount(5)
+        window.table.setHorizontalHeaderLabels(["EmpID", "First Name", "Last Name", "Start Date", "Exit Date"])
+        
+        # Llenar la tabla con los datos
+        for row_index, item in enumerate(data[start_index:end_index]):
+            window.table.insertRow(row_index)
+            window.table.setItem(row_index, 0, QTableWidgetItem(str(item.get('EmpID', ''))))
+            window.table.setItem(row_index, 1, QTableWidgetItem(item.get('FirstName', '')))
+            window.table.setItem(row_index, 2, QTableWidgetItem(item.get('LastName', '')))
+            window.table.setItem(row_index, 3, QTableWidgetItem(item.get('StartDate', '')))
+            window.table.setItem(row_index, 4, QTableWidgetItem(item.get('ExitDate', '')))
+
+
 
 def next_page(window):
     global current_page
