@@ -19,8 +19,10 @@ public:
             std::string table_name = utility::conversions::to_utf8string(query[U("table_name")]);
             if(table_name == "employee"){
               AVLFile<int, EmployeeRecordAVL> avlFile(table_name+"_avl.dat");
-              auto inorderResult = avlFile.inorder();
-
+              int reads = 0; 
+              int writes = 0;
+              auto inorderResult = avlFile.inorder(reads, writes);
+              
               json::value response_data = json::value::array();
               for (size_t i = 0; i < inorderResult.size(); ++i) {
                   json::value recordJson;
@@ -52,11 +54,17 @@ public:
                   recordJson[U("CurrentEmployeeRating")] = web::json::value::number(inorderResult[i].CurrentEmployeeRating);
                   response_data[i] = recordJson;
               }
-              request.reply(status_codes::OK, response_data);
+              json::value responseJson;
+              responseJson[U("reads")] = json::value::number(reads);
+              responseJson[U("writes")] = json::value::number(writes);
+              responseJson[U("results")] = response_data;
+              request.reply(status_codes::OK, responseJson);
             }
             if(table_name == "game"){
               AVLFile<int, GameRecordAVL> avlFile(table_name+"_avl.dat");
-              auto inorderResult = avlFile.inorder();
+              int reads = 0; 
+              int writes = 0;
+              auto inorderResult = avlFile.inorder(reads, writes);
               json::value response_data = json::value::array();
               for (size_t i = 0; i < inorderResult.size(); ++i) {
                   json::value recordJson;
@@ -75,7 +83,11 @@ public:
                   recordJson[U("Review")] = web::json::value::number(inorderResult[i].Review);
                   response_data[i] = recordJson;
               }
-              request.reply(status_codes::OK, response_data);
+              json::value responseJson;
+              responseJson[U("reads")] = json::value::number(reads);
+              responseJson[U("writes")] = json::value::number(writes);
+              responseJson[U("results")] = response_data;
+              request.reply(status_codes::OK, responseJson);
             }
         } else {
             request.reply(status_codes::BadRequest, U("Filename parameter is required."));
@@ -89,7 +101,9 @@ public:
             std::string table_name = utility::conversions::to_utf8string(query[U("table_name")]);
             if (table_name == "employee"){
               AVLFile<int, EmployeeRecordAVL> avlFile(table_name+"_avl.dat");
-              EmployeeRecordAVL record = avlFile.search_by_key(key);
+              int reads = 0; 
+              int writes = 0;
+              EmployeeRecordAVL record = avlFile.search_by_key(key, reads, writes);
 
               if (record.key != 1) {
                   json::value recordJson;
@@ -119,14 +133,21 @@ public:
                   recordJson[U("MaritalDesc")] = web::json::value::string(utility::conversions::to_string_t(record.MaritalDesc));
                   recordJson[U("PerformanceScore")] = web::json::value::string(utility::conversions::to_string_t(record.PerformanceScore));
                   recordJson[U("CurrentEmployeeRating")] = web::json::value::number(record.CurrentEmployeeRating);
-                  request.reply(status_codes::OK, recordJson);
+
+                  json::value responseJson;
+                  responseJson[U("reads")] = json::value::number(reads);
+                  responseJson[U("writes")] = json::value::number(writes);
+                  responseJson[U("results")] = recordJson;
+                  request.reply(status_codes::OK, responseJson);
               } else {
                   request.reply(status_codes::NotFound, U("Record not found."));
               }
             }
             if (table_name == "game"){
               AVLFile<int, GameRecordAVL> avlFile(table_name+"_avl.dat");
-              GameRecordAVL record = avlFile.search_by_key(key);
+              int reads = 0;
+              int writes = 0;
+              GameRecordAVL record = avlFile.search_by_key(key, reads, writes);
               if (record.key != -1) {
                   json::value recordJson;
                   recordJson[U("key")] = web::json::value::number(record.key);
@@ -142,7 +163,12 @@ public:
                   recordJson[U("RestOfWorld")] = web::json::value::number(record.RestOfWorld);
                   recordJson[U("Global")] = web::json::value::number(record.Global);
                   recordJson[U("Review")] = web::json::value::number(record.Review);
-                  request.reply(status_codes::OK, recordJson);
+
+                  json::value responseJson;
+                  responseJson[U("reads")] = json::value::number(reads);
+                  responseJson[U("writes")] = json::value::number(writes);
+                  responseJson[U("results")] = recordJson;
+                  request.reply(status_codes::OK, responseJson);
               } else {
                   request.reply(status_codes::NotFound, U("Record not found."));
               }
@@ -162,7 +188,9 @@ public:
 
             if (table_name == "employee"){
                 AVLFile<int, EmployeeRecordAVL> avlFile(table_name+"_avl.dat");
-                auto rangeResult = avlFile.rangeSearch(start, end);
+                int reads = 0;
+                int writes = 0;
+                auto rangeResult = avlFile.rangeSearch(start, end, reads, writes);
 
                 json::value response_data = json::value::array();
                 for (size_t i = 0; i < rangeResult.size(); ++i) {
@@ -195,10 +223,16 @@ public:
                     recordJson[U("CurrentEmployeeRating")] = web::json::value::number(rangeResult[i].CurrentEmployeeRating);
                     response_data[i] = recordJson;
                 }
-                request.reply(status_codes::OK, response_data);
+                json::value responseJson;
+                responseJson[U("reads")] = json::value::number(reads);
+                responseJson[U("writes")] = json::value::number(writes);
+                responseJson[U("results")] = response_data;
+                request.reply(status_codes::OK, responseJson);
             } if(table_name == "game"){
                 AVLFile<int, GameRecordAVL> avlFile(table_name+"_avl.dat");
-                auto rangeResult = avlFile.rangeSearch(start, end);
+                int reads = 0;
+                int writes = 0;
+                auto rangeResult = avlFile.rangeSearch(start, end, reads, writes);
 
                 json::value response_data = json::value::array();
                 for (size_t i = 0; i < rangeResult.size(); ++i) {
@@ -218,7 +252,11 @@ public:
                     recordJson[U("Review")] = web::json::value::number(rangeResult[i].Review);
                     response_data[i] = recordJson;
                 }
-                request.reply(status_codes::OK, response_data);
+                json::value responseJson;
+                responseJson[U("reads")] = json::value::number(reads);
+                responseJson[U("writes")] = json::value::number(writes);
+                responseJson[U("results")] = response_data;
+                request.reply(status_codes::OK, responseJson);
           }
         } else {
             request.reply(status_codes::BadRequest, U("Start, end, and filename parameters are required."));
@@ -310,8 +348,13 @@ public:
                     record.CurrentEmployeeRating = request_data[U("CurrentEmployeeRating")].as_double();
 
                     AVLFile<int, EmployeeRecordAVL> avlFile(table_name+"_avl.dat");
-                    avlFile.insert(record);
-                    request.reply(status_codes::OK, U("Record added successfully."));
+                    int reads = 0;
+                    int writes = 0;
+                    avlFile.insert(record, reads, writes);
+                    json::value responseJson;
+                    responseJson[U("reads")] = json::value::number(reads);
+                    responseJson[U("writes")] = json::value::number(writes);
+                    request.reply(status_codes::OK, responseJson);
                 } else {
                     request.reply(status_codes::BadRequest, U("Invalid record format."));
                 }
@@ -352,9 +395,15 @@ public:
                     record.Global = request_data[U("Global")].as_double();
                     record.Review = request_data[U("Review")].as_double();
 
+                    int reads = 0;
+                    int writes = 0;
                     AVLFile<int, GameRecordAVL> avlFile(table_name+"_avl.dat");
-                    avlFile.insert(record);
-                    request.reply(status_codes::OK, U("Record added successfully."));
+                    avlFile.insert(record, reads, writes);
+
+                    json::value responseJson;
+                    responseJson[U("reads")] = json::value::number(reads);
+                    responseJson[U("writes")] = json::value::number(writes);
+                    request.reply(status_codes::OK, responseJson);
                 } else {
                     request.reply(status_codes::BadRequest, U("Invalid record format."));
                 }
@@ -376,6 +425,8 @@ public:
 
                     try {
                         if (table_name == "employee") {
+                            int sum_reads = 0;
+                            int sum_writes = 0;
                             AVLFile<int, EmployeeRecordAVL> avlFile(table_name + "_avl.dat");
                             std::ifstream file(csv_path);
                             if (!file.is_open()) {
@@ -389,9 +440,9 @@ public:
                             while (std::getline(file, line)) {
                                 try {
                                     std::vector<std::string> fields = split(line);
-                                    if (fields.size() < 20) { // Asegúrate de que haya suficientes campos
+                                    if (fields.size() < 20) { 
                                         std::cerr << "Error: Línea con menos de 20 campos." << std::endl;
-                                        continue; // Saltar líneas con errores
+                                        continue; 
                                     }
 
                                     EmployeeRecordAVL record;
@@ -422,7 +473,11 @@ public:
                                     strcpy(record.PerformanceScore, fields[24].c_str());
                                     record.CurrentEmployeeRating = std::stod(fields[25]);
 
-                                    avlFile.insert(record);
+                                    int reads = 0;
+                                    int writes = 0;
+                                    avlFile.insert(record, reads, writes);
+                                    sum_reads += reads; 
+                                    sum_writes += writes;
                                 } catch (const std::exception &e) {
                                     std::cerr << "Error al procesar la línea: " << line << " - " << e.what() << std::endl;
                                     continue; // Continuar con la siguiente línea
@@ -430,8 +485,14 @@ public:
                             }
                             cout << "End Reading" << endl;
                             file.close();
-                            request.reply(status_codes::OK, U("CSV loaded."));
+                            json::value responseJson;
+                            responseJson[U("message")] = json::value::string(U("CSV loaded."));
+                            responseJson[U("reads")] = json::value::number(sum_reads);
+                            responseJson[U("writes")] = json::value::number(sum_writes);
+                            request.reply(status_codes::OK, responseJson);
                         } else if (table_name == "game") {
+                            int sum_reads = 0;
+                            int sum_writes = 0;
                             AVLFile<int, GameRecordAVL> avlFile(table_name + "_avl.dat");
                             std::ifstream file(csv_path);
                             if (!file.is_open()) {
@@ -439,14 +500,14 @@ public:
                             }
 
                             std::string line;
-                            std::getline(file, line); // Ignorar el encabezado
+                            std::getline(file, line); 
                             
                             while (std::getline(file, line)) {
                                 try {
                                     std::vector<std::string> fields = split(line);
                                     if (fields.size() < 13) {
                                         std::cerr << "Error: Línea con menos de 13 campos." << std::endl;
-                                        continue; // Saltar líneas con errores
+                                        continue; 
                                     }
 
                                     GameRecordAVL record;
@@ -464,14 +525,22 @@ public:
                                     record.Global = std::stod(fields[11]);
                                     record.Review = std::stod(fields[12]);
 
-                                    avlFile.insert(record);
+                                    int reads = 0;
+                                    int writes = 0;
+                                    avlFile.insert(record, reads, writes);
+                                    sum_reads += reads; 
+                                    sum_writes += writes;
                                 } catch (const std::exception &e) {
                                     std::cerr << "Error al procesar la línea: " << line << " - " << e.what() << std::endl;
                                     continue; // Continuar con la siguiente línea
                                 }
                             }
                             file.close();
-                            request.reply(status_codes::OK, U("CSV loaded."));
+                            json::value responseJson;
+                            responseJson[U("message")] = json::value::string(U("CSV loaded."));
+                            responseJson[U("reads")] = json::value::number(sum_reads);
+                            responseJson[U("writes")] = json::value::number(sum_writes);
+                            request.reply(status_codes::OK, responseJson);
                         } else {
                             request.reply(status_codes::BadRequest, U("Invalid table name."));
                         }
@@ -496,12 +565,24 @@ public:
 
             if(table_name == "employee"){
                 AVLFile<int, EmployeeRecordAVL> avlFile(table_name+"_avl.dat");
-                avlFile.delete_by_key(key);
-                request.reply(status_codes::OK, U("Record deleted successfully."));
+                int reads = 0;
+                int writes = 0;
+                avlFile.delete_by_key(key, reads, writes);
+                json::value responseJson;
+                responseJson[U("message")] = json::value::string(U("Record deleted successfully."));
+                responseJson[U("reads")] = json::value::number(reads);
+                responseJson[U("writes")] = json::value::number(writes);
+                request.reply(status_codes::OK, responseJson);
             } if (table_name == "game"){
                 AVLFile<int, GameRecordAVL> avlFile(table_name+"_avl.dat");
-                avlFile.delete_by_key(key);
-                request.reply(status_codes::OK, U("Record deleted successfully."));
+                int reads = 0;
+                int writes = 0;
+                avlFile.delete_by_key(key, reads, writes);
+                json::value responseJson;
+                responseJson[U("message")] = json::value::string(U("Record deleted successfully."));
+                responseJson[U("reads")] = json::value::number(reads);
+                responseJson[U("writes")] = json::value::number(writes);
+                request.reply(status_codes::OK, responseJson);
             }
         } else {
             request.reply(status_codes::BadRequest, U("Key and filename parameters are required."));

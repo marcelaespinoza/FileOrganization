@@ -12,21 +12,21 @@ class SequentialFile {
 private:
     std::string dataFileName;
     std::string auxFileName;
-    int MAX_REBUILD_FACTOR = 10;
+    int MAX_REBUILD_FACTOR = 50;
 
 public:
     SequentialFile(const std::string& dataFileName, const std::string& auxFileName);
 
-    void insertIntoAuxFile(T & record);
-    void updatePointers(T & record, int newRecordPosition);
-    void updateDataFile(T & record);
-    void updateAuxFile(T & previousRecord, T& record);
-    void rebuildSequential();
-    void checkRebuild();
-    T search_by_key(Key key);
-    std::vector<T> get_all();
-    std::vector<T> get_between(Key key_begin, Key key_end);
-    bool delete_by_key(Key key);
+    void insertIntoAuxFile(T & record, int& reads, int& writes);
+    void updatePointers(T & record, int newRecordPosition, int& reads, int& writes);
+    void updateDataFile(T & record, int& reads, int& writes);
+    void updateAuxFile(T & previousRecord, T& record, int& reads, int& writes);
+    void rebuildSequential(int& reads, int& writes);
+    void checkRebuild(int& reads, int& writes);
+    T search_by_key(Key keyint, int& reads, int& writes);
+    std::vector<T> get_all(int& reads, int& writes);
+    std::vector<T> get_between(Key key_begin, Key key_end, int& reads, int& writes);
+    bool delete_by_key(Key key, int& reads, int& writes);
 };
 
 
@@ -47,23 +47,25 @@ SequentialFile<Key, T>::SequentialFile(const std::string& dataFileName, const st
 
 // Insertar en el archivo auxiliar
 template<typename Key, typename T>
-void SequentialFile<Key, T>::insertIntoAuxFile(T& record) {
+void SequentialFile<Key, T>::insertIntoAuxFile(T& record, int& reads, int& writes) {
     std::ofstream auxFile(auxFileName, std::ios::binary | std::ios::app);
     auxFile.seekp(0, std::ios::end);
     int newRecordPosition = auxFile.tellp() / sizeof(T); // Calcular posición
     record.pos = newRecordPosition; // Asignar la posición al registro
     auxFile.write(reinterpret_cast<const char*>(&record), sizeof(T));
     auxFile.close();
+    writes++;
 
-    updatePointers(record, newRecordPosition); // Llamar a updatePointers aquí
-    this->checkRebuild();
+    updatePointers(record, newRecordPosition, reads, writes); 
+    this->checkRebuild(reads, writes);
 }
 
 template<typename Key, typename T>
-void SequentialFile<Key, T>::updatePointers(T& record, int newRecordPosition) {
+void SequentialFile<Key, T>::updatePointers(T& record, int newRecordPosition, int& reads, int& writes) {
     T currentRecord;
 
     std::ifstream dataFile(dataFileName, std::ios::binary);
+    reads++;
     if (dataFile.read(reinterpret_cast<char*>(&currentRecord), sizeof(T))) {
         // Si el dummy no apunta a ningún registro, actualizamos directamente
         if (currentRecord.nextRecord == -1) {
@@ -71,7 +73,7 @@ void SequentialFile<Key, T>::updatePointers(T& record, int newRecordPosition) {
             currentRecord.nextFileChar = 'a'; // Apunta al archivo auxiliar
             currentRecord.accFile = 'd'; // Indica que está en datafile
 
-            updateDataFile(currentRecord); // Guardar el dummy actualizado en datafile
+            updateDataFile(currentRecord, reads, writes); // Guardar el dummy actualizado en datafile
             return; // No hay más que actualizar en esta primera inserción
         }
 
@@ -80,17 +82,17 @@ void SequentialFile<Key, T>::updatePointers(T& record, int newRecordPosition) {
                 if (currentRecord.accFile == 'd') {
                     currentRecord.nextRecord = record.pos; // Actualizar para que apunte al nuevo registro
                     currentRecord.nextFileChar = 'a'; // Ahora apunta al archivo auxiliar
-                    updateDataFile(currentRecord); // Guardar en datafile
+                    updateDataFile(currentRecord, reads, writes); // Guardar en datafile
                 } else {
                     currentRecord.nextRecord = record.pos; // Actualizar para que apunte al nuevo registro
                     currentRecord.nextFileChar = 'a'; // Ahora apunta al datafile
-                    updateAuxFile(currentRecord, currentRecord); // Guardar en auxfile
+                    updateAuxFile(currentRecord, currentRecord, reads, writes); // Guardar en auxfile
                 }
 
                 // Actualizar el nuevo registro para que apunte a -1 (final)
                 record.nextRecord = -1;
                 record.nextFileChar = 'a'; // El nuevo registro se guarda en auxfile
-                updateAuxFile(currentRecord, record); // Guardar el nuevo registro en auxfile
+                updateAuxFile(currentRecord, record, reads, writes); // Guardar el nuevo registro en auxfile
                 return;
             }
 
@@ -106,6 +108,7 @@ void SequentialFile<Key, T>::updatePointers(T& record, int newRecordPosition) {
 
             // Ir a la posición del siguiente registro
             nextFile.seekg(currentRecord.nextRecord * sizeof(T), std::ios::beg);
+            reads++;
             if (!nextFile.read(reinterpret_cast<char*>(&nextRecord), sizeof(T))) {
                 break; // No hay más registros para comparar
             }
@@ -117,9 +120,9 @@ void SequentialFile<Key, T>::updatePointers(T& record, int newRecordPosition) {
 
                 // Guardar el currentRecord en su respectivo archivo
                 if (currentRecord.accFile == 'd') {
-                    updateDataFile(currentRecord); // Guardar en datafile
+                    updateDataFile(currentRecord, reads, writes); // Guardar en datafile
                 } else {
-                    updateAuxFile(currentRecord, currentRecord); // Guardar en auxfile
+                    updateAuxFile(currentRecord, currentRecord, reads, writes); // Guardar en auxfile
                 }
 
                 // Actualizar el nuevo registro para que apunte al nextRecord
@@ -127,7 +130,7 @@ void SequentialFile<Key, T>::updatePointers(T& record, int newRecordPosition) {
                 record.nextFileChar = nextRecord.accFile;
 
                 // Guardar el nuevo registro en el archivo auxiliar
-                updateAuxFile(currentRecord, record);
+                updateAuxFile(currentRecord, record, reads, writes);
                 return;
             }
 
@@ -141,24 +144,26 @@ void SequentialFile<Key, T>::updatePointers(T& record, int newRecordPosition) {
 
 // Actualiza el archivo datafile con el registro dado
 template<typename Key, typename T>
-void SequentialFile<Key, T>::updateDataFile(T& record) {
+void SequentialFile<Key, T>::updateDataFile(T& record, int& reads, int& writes) {
     std::fstream dataFile(dataFileName, std::ios::binary | std::ios::in | std::ios::out);
     dataFile.seekp(record.pos * sizeof(T), std::ios::beg);
     dataFile.write(reinterpret_cast<const char*>(&record), sizeof(T));
+    writes++;
     dataFile.close();
 }
 
 // Actualiza el archivo auxfile con el registro dado
 template<typename Key, typename T>
-void SequentialFile<Key, T>::updateAuxFile(T& previousRecord, T& record) {
+void SequentialFile<Key, T>::updateAuxFile(T& previousRecord, T& record, int& reads, int& writes) {
     std::fstream auxFile(auxFileName, std::ios::binary | std::ios::in | std::ios::out);
     auxFile.seekp(record.pos * sizeof(T), std::ios::beg);
     auxFile.write(reinterpret_cast<const char*>(&record), sizeof(T));
+    writes++;
     auxFile.close();
 }
 
 template<typename Key, typename T>
-void SequentialFile<Key, T>::rebuildSequential() {
+void SequentialFile<Key, T>::rebuildSequential(int& reads, int& writes) {
     std::ifstream dataFile(dataFileName, std::ios::binary);
     std::ifstream auxFile(auxFileName, std::ios::binary);
     std::ofstream tmpDataFile("tmp_datafile.dat", std::ios::binary);
@@ -172,6 +177,7 @@ void SequentialFile<Key, T>::rebuildSequential() {
     int counter = 0;
 
     // Read the first record from dataFile
+    reads++;
     if (!dataFile.read(reinterpret_cast<char*>(&currentRecord), sizeof(T))) {
         // If the data file is empty, just return
         dataFile.close();
@@ -182,6 +188,7 @@ void SequentialFile<Key, T>::rebuildSequential() {
 
     // Skip the dummy record if it has a key of -1
     if (currentRecord.key == -1) {
+        reads++;
         if(currentRecord.nextFileChar == 'd'){
             dataFile.seekg(currentRecord.nextRecord * sizeof(T), std::ios::beg);
             dataFile.read(reinterpret_cast<char*>(&currentRecord), sizeof(T));
@@ -207,6 +214,7 @@ void SequentialFile<Key, T>::rebuildSequential() {
         currentRecord.accFile = 'd'; // Indicate that it's in datafile
 
         // Write the updated current record to the temporary data file
+        writes++;
         tmpDataFile.write(reinterpret_cast<char*>(&currentRecord), sizeof(T));
         if(currentRecord.nextRecord == -1) break;
         
@@ -214,6 +222,7 @@ void SequentialFile<Key, T>::rebuildSequential() {
         counter++;
 
         // Read the next record based on nextFileChar
+        reads++;
         if (nextFileChar == 'd') {
             // Read from dataFile
             dataFile.seekg(nextRecordPosition * sizeof(T), std::ios::beg);
@@ -242,7 +251,7 @@ void SequentialFile<Key, T>::rebuildSequential() {
 }
 
 template<typename Key, typename T>
-T SequentialFile<Key, T>::search_by_key(Key key){
+T SequentialFile<Key, T>::search_by_key(Key key, int& reads, int& writes){
     T result;
     std::ifstream dataFile(dataFileName, std::ios::binary);
     std::ifstream auxFile(auxFileName, std::ios::binary);
@@ -253,12 +262,14 @@ T SequentialFile<Key, T>::search_by_key(Key key){
 
     T currentRecord;
 
+    reads++;
     if (!dataFile.read(reinterpret_cast<char*>(&currentRecord), sizeof(T))) {
         dataFile.close();
         auxFile.close();
         return result;
     }
 
+    reads++;
     if (currentRecord.key == -1) {
         if(currentRecord.nextFileChar == 'd'){
             dataFile.seekg(currentRecord.nextRecord * sizeof(T), std::ios::beg);
@@ -276,6 +287,7 @@ T SequentialFile<Key, T>::search_by_key(Key key){
           result = currentRecord;
           break;
         } else if (currentRecord.key > key) break;
+        reads++;
         if (nextFileChar == 'd') {
             // Read from dataFile
             dataFile.seekg(nextRecordPosition * sizeof(T), std::ios::beg);
@@ -297,7 +309,7 @@ T SequentialFile<Key, T>::search_by_key(Key key){
 }
 
 template<typename Key, typename T>
-std::vector<T> SequentialFile<Key, T>::get_all() {
+std::vector<T> SequentialFile<Key, T>::get_all(int& reads, int& writes) {
     std::vector<T> all_records;
     std::ifstream dataFile(dataFileName, std::ios::binary);
     std::ifstream auxFile(auxFileName, std::ios::binary);
@@ -308,12 +320,14 @@ std::vector<T> SequentialFile<Key, T>::get_all() {
 
     T currentRecord;
 
+    reads++;
     if (!dataFile.read(reinterpret_cast<char*>(&currentRecord), sizeof(T))) {
         dataFile.close();
         auxFile.close();
         return all_records;
     }
 
+    reads++;
     if (currentRecord.key == -1) {
         if(currentRecord.nextFileChar == 'd'){
             dataFile.seekg(currentRecord.nextRecord * sizeof(T), std::ios::beg);
@@ -328,6 +342,7 @@ std::vector<T> SequentialFile<Key, T>::get_all() {
         char nextFileChar = currentRecord.nextFileChar;
         int nextRecordPosition = currentRecord.nextRecord;
         all_records.push_back(currentRecord);
+        reads++;
         if (nextFileChar == 'd') {
             // Read from dataFile
             dataFile.seekg(nextRecordPosition * sizeof(T), std::ios::beg);
@@ -348,7 +363,7 @@ std::vector<T> SequentialFile<Key, T>::get_all() {
 }
 
 template<typename Key, typename T>
-void SequentialFile<Key, T>::checkRebuild() {
+void SequentialFile<Key, T>::checkRebuild(int& reads, int& writes) {
     std::ifstream auxFile(auxFileName, std::ios::binary);
     if (!auxFile.is_open()) {
         std::cerr << "Error opening files." << std::endl;
@@ -361,13 +376,13 @@ void SequentialFile<Key, T>::checkRebuild() {
     size_t numRecords = fileSize / recordSize;
     if(numRecords == MAX_REBUILD_FACTOR){
       std::cout << "REBUILD FACTOR \n";
-      this->rebuildSequential();
+      this->rebuildSequential(reads, writes);
     }
     auxFile.close();
 }
 
 template<typename Key, typename T>
-std::vector<T> SequentialFile<Key, T>::get_between(Key key_begin, Key key_end) {
+std::vector<T> SequentialFile<Key, T>::get_between(Key key_begin, Key key_end, int& reads, int& writes) {
     std::vector<T> range_records;
     std::ifstream dataFile(dataFileName, std::ios::binary);
     std::ifstream auxFile(auxFileName, std::ios::binary);
@@ -378,12 +393,14 @@ std::vector<T> SequentialFile<Key, T>::get_between(Key key_begin, Key key_end) {
 
     T currentRecord;
 
+    reads++;
     if (!dataFile.read(reinterpret_cast<char*>(&currentRecord), sizeof(T))) {
         dataFile.close();
         auxFile.close();
         return range_records;
     }
 
+    reads++;
     if (currentRecord.key == -1) {
         if(currentRecord.nextFileChar == 'd'){
             dataFile.seekg(currentRecord.nextRecord * sizeof(T), std::ios::beg);
@@ -400,6 +417,7 @@ std::vector<T> SequentialFile<Key, T>::get_between(Key key_begin, Key key_end) {
         if(key_begin <= currentRecord.key && currentRecord.key  <= key_end){
           range_records.push_back(currentRecord);
         } else if (currentRecord.key > key_end) break;
+        reads++;
         if (nextFileChar == 'd') {
             // Read from dataFile
             dataFile.seekg(nextRecordPosition * sizeof(T), std::ios::beg);
@@ -421,7 +439,7 @@ std::vector<T> SequentialFile<Key, T>::get_between(Key key_begin, Key key_end) {
 
 
 template<typename Key, typename T>
-bool SequentialFile<Key, T>::delete_by_key(Key key){
+bool SequentialFile<Key, T>::delete_by_key(Key key, int& reads, int& writes){
     std::fstream dataFile(dataFileName, std::ios::in | std::ios::out | std::ios::binary);
     std::fstream auxFile(auxFileName, std::ios::in | std::ios::out | std::ios::binary);
 
@@ -432,6 +450,7 @@ bool SequentialFile<Key, T>::delete_by_key(Key key){
 
     T currentRecord;
 
+    reads++;
     if (!dataFile.read(reinterpret_cast<char*>(&currentRecord), sizeof(T))) {
         dataFile.close();
         auxFile.close();
@@ -439,6 +458,7 @@ bool SequentialFile<Key, T>::delete_by_key(Key key){
     }
 
     if (currentRecord.key == -1) {
+        reads++;
         if(currentRecord.nextFileChar == 'd'){
             dataFile.seekg(currentRecord.nextRecord * sizeof(T), std::ios::beg);
             dataFile.read(reinterpret_cast<char*>(&currentRecord), sizeof(T));
@@ -452,6 +472,7 @@ bool SequentialFile<Key, T>::delete_by_key(Key key){
         char nextFileChar = currentRecord.nextFileChar;
         int nextRecordPosition = currentRecord.nextRecord;
         T tmp_record;
+        reads++;
         if (nextFileChar == 'd') {
             // Read from dataFile
             dataFile.seekg(nextRecordPosition * sizeof(T), std::ios::beg);
@@ -468,6 +489,7 @@ bool SequentialFile<Key, T>::delete_by_key(Key key){
         if(tmp_record.key == key){
           currentRecord.nextRecord = tmp_record.nextRecord;
           currentRecord.nextFileChar = tmp_record.nextFileChar;
+          reads++;
           if(currentRecord.accFile == 'a'){
             auxFile.seekp(currentRecord.pos * sizeof(T), std::ios::beg);
             auxFile.write(reinterpret_cast<const char*>(&currentRecord), sizeof(T));

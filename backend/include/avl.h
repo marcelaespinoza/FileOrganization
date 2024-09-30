@@ -16,23 +16,23 @@ private:
 
 public:
     AVLFile(string filename);
-    void insert(T record);
-    void delete_by_key(Key key);
-    T search_by_key(Key key);
-    vector<T> inorder();
-    vector<T> rangeSearch(Key key_begin, Key key_end);
+    void insert(T record, int& reads, int& writes);
+    void delete_by_key(Key key, int& reads, int& writes);
+    T search_by_key(Key key, int& reads, int& writes);
+    vector<T> inorder(int& reads, int& writes);
+    vector<T> rangeSearch(Key key_begin, Key key_end, int& reads, int& writes);
 
 private:
-    void insert_and_balance(long& pos_node, T record, fstream& file);
-    void balance(fstream& file, long pos_node);
-    int BalancingFactor(long pos_node, fstream& file);
-    long rightRotate(fstream& file, long y_pos);
-    long leftRotate(fstream& file, long x_pos);
-    int height(long pos_node, fstream& file);
-    void updateHeight(long pos_node, fstream& file);
-    void inorder(long pos_node, vector<T>& result, fstream& file);
-    void rangeSearch(long pos_node, int start, int end, vector<T>& results, fstream& file);
-    long deleteNode(long pos_node, Key key, fstream& file);
+    void insert_and_balance(long& pos_node, T record, fstream& file, int& reads, int& writes);
+    void balance(fstream& file, long pos_node, int& reads, int& writes);
+    int BalancingFactor(long pos_node, fstream& file, int& reads, int& writes);
+    long rightRotate(fstream& file, long y_pos, int& reads, int& writes);
+    long leftRotate(fstream& file, long x_pos, int& reads, int& writes);
+    int height(long pos_node, fstream& file, int& reads, int& writes);
+    void updateHeight(long pos_node, fstream& file,int& reads, int& writes);
+    void inorderP(long pos_node, vector<T>& result, fstream& file, int& reads, int& writes);
+    void rangeSearchP(long pos_node, int start, int end, vector<T>& results, fstream& file, int& reads, int& writes);
+    long deleteNode(long pos_node, Key key, fstream& file, int& reads, int& writes);
 };
 
 template<typename Key, typename T>
@@ -48,7 +48,7 @@ AVLFile<Key, T>::AVLFile(string filename) : filename(filename) {
 }
 
 template<typename Key, typename T>
-void AVLFile<Key, T>::insert(T record) {
+void AVLFile<Key, T>::insert(T record, int& reads, int& writes) {
     fstream file;
     file.open(this->filename, ios::in | ios::out | ios::binary | ios::ate);
 
@@ -61,19 +61,20 @@ void AVLFile<Key, T>::insert(T record) {
     if (this->pos_root == -1) {
         file.seekp(0, ios::beg);
         file.write((char*)&record, sizeof(T));
+        writes++;
         this->pos_root = 0;
     } else {
-        insert_and_balance(this->pos_root, record, file);
+        insert_and_balance(this->pos_root, record, file, reads, writes);
     }
 
     file.close();
 }
 
 template<typename Key, typename T>
-void AVLFile<Key, T>::delete_by_key(Key key) {
+void AVLFile<Key, T>::delete_by_key(Key key, int& reads, int& writes) {
     fstream file(this->filename, ios::in | ios::out | ios::binary);
     if (this->pos_root != -1) {
-        this->pos_root = deleteNode(this->pos_root, key, file);
+        this->pos_root = deleteNode(this->pos_root, key, file, reads, writes);
     } else {
         cout << "No hay elementos registrados" << endl;
     }
@@ -81,11 +82,11 @@ void AVLFile<Key, T>::delete_by_key(Key key) {
 }
 
 template<typename Key, typename T>
-vector<T> AVLFile<Key, T>::inorder() {
+vector<T> AVLFile<Key, T>::inorder(int& reads, int& writes) {
     fstream file(this->filename, ios::in | ios::binary);
     vector<T> result;
     if (this->pos_root != -1) {
-        inorder(this->pos_root, result, file);
+        inorderP(this->pos_root, result, file, reads, writes);
     } else {
         cout << "No hay elementos registrados" << endl;
     }
@@ -94,11 +95,11 @@ vector<T> AVLFile<Key, T>::inorder() {
 }
 
 template<typename Key, typename T>
-vector<T> AVLFile<Key, T>::rangeSearch(Key key_start, Key key_end) {
+vector<T> AVLFile<Key, T>::rangeSearch(Key key_start, Key key_end, int& reads, int& writes) {
     fstream file(this->filename, ios::in | ios::binary);
     vector<T> results;
     if (this->pos_root != -1) {
-        rangeSearch(this->pos_root, key_start, key_end, results, file);
+        rangeSearchP(this->pos_root, key_start, key_end, results, file, reads, writes);
     } else {
         cout << "No hay elementos registrados" << endl;
     }
@@ -107,22 +108,24 @@ vector<T> AVLFile<Key, T>::rangeSearch(Key key_start, Key key_end) {
 }
 
 template<typename Key, typename T>
-void AVLFile<Key, T>::insert_and_balance(long& pos_node, T record, fstream& file) {
+void AVLFile<Key, T>::insert_and_balance(long& pos_node, T record, fstream& file, int& reads, int& writes) {
     if (pos_node == -1) {
         file.seekp(0, ios::end);
         pos_node = file.tellp() / sizeof(T);
         file.write((char*)&record, sizeof(T));
+        writes++;
         return;
     }
 
     T node;
     file.seekg(pos_node * sizeof(T));
     file.read((char*)&node, sizeof(T));
+    reads++;
 
     if (record.key < node.key) {
-        insert_and_balance(node.left, record, file);
+        insert_and_balance(node.left, record, file, reads, writes);
     } else if (record.key > node.key) {
-        insert_and_balance(node.right, record, file);
+        insert_and_balance(node.right, record, file, reads, writes);
     } else {
         cout << "El nodo con código " << record.key << " ya existe." << endl;
         return;
@@ -130,54 +133,60 @@ void AVLFile<Key, T>::insert_and_balance(long& pos_node, T record, fstream& file
 
     file.seekp(pos_node * sizeof(T));
     file.write((char*)&node, sizeof(T));
-    balance(file, pos_node);
+    writes++;
+    balance(file, pos_node, reads, writes);
 }
 
 template<typename Key, typename T>
-void AVLFile<Key, T>::balance(fstream& file, long pos_node) {
+void AVLFile<Key, T>::balance(fstream& file, long pos_node, int& reads, int& writes) {
     if (pos_node == -1) return;
 
     T node;
     file.seekg(pos_node * sizeof(T));
     file.read((char*)&node, sizeof(T));
+    reads++;
 
-    updateHeight(pos_node, file);
-    int balanceFactor = BalancingFactor(pos_node, file);
+    updateHeight(pos_node, file, reads, writes);
+    int balanceFactor = BalancingFactor(pos_node, file, reads, writes);
 
     if (balanceFactor > 1) {
-        if (BalancingFactor(node.left, file) < 0) {
-            node.left = leftRotate(file, node.left);
+        if (BalancingFactor(node.left, file, reads, writes) < 0) {
+            node.left = leftRotate(file, node.left, reads, writes);
         }
-        pos_node = rightRotate(file, pos_node);
+        pos_node = rightRotate(file, pos_node, reads, writes);
     } else if (balanceFactor < -1) {
-        if (BalancingFactor(node.right, file) > 0) {
-            node.right = rightRotate(file, node.right);
+        if (BalancingFactor(node.right, file, reads, writes) > 0) {
+            node.right = rightRotate(file, node.right, reads, writes);
         }
-        pos_node = leftRotate(file, pos_node);
+        pos_node = leftRotate(file, pos_node, reads, writes);
     }
 
     file.seekp(pos_node * sizeof(T));
     file.write((char*)&node, sizeof(T));
+    writes++;
 }
 
 template<typename Key, typename T>
-int AVLFile<Key, T>::BalancingFactor(long pos_node, fstream& file) {
+int AVLFile<Key, T>::BalancingFactor(long pos_node, fstream& file, int& reads, int& writes) {
     if (pos_node == -1) return 0;
 
     T record;
     file.seekg(pos_node * sizeof(T));
     file.read((char*)&record, sizeof(T));
+    reads++;
 
-    return height(record.left, file) - height(record.right, file);
+    return height(record.left, file, reads, writes) - height(record.right, file, reads, writes);
 }
 
 template<typename Key, typename T>
-long AVLFile<Key, T>::rightRotate(fstream& file, long y_pos) {
+long AVLFile<Key, T>::rightRotate(fstream& file, long y_pos, int& reads, int& writes) {
     T y, x;
     file.seekg(y_pos * sizeof(T));
     file.read((char*)&y, sizeof(T));
+    reads++;
     file.seekg(y.left * sizeof(T));
     file.read((char*)&x, sizeof(T));
+    reads++;
 
     long T2 = x.right; 
 
@@ -186,19 +195,23 @@ long AVLFile<Key, T>::rightRotate(fstream& file, long y_pos) {
 
     file.seekp(y_pos * sizeof(T));
     file.write((char*)&y, sizeof(T));
+    writes++;
     file.seekp(x.left * sizeof(T)); 
     file.write((char*)&x, sizeof(T));
+    writes++;
 
     return x.left; 
 }
 
 template<typename Key, typename T>
-long AVLFile<Key, T>::leftRotate(fstream& file, long x_pos) {
+long AVLFile<Key, T>::leftRotate(fstream& file, long x_pos, int& reads, int& writes) {
     T x, y;
     file.seekg(x_pos * sizeof(T));
     file.read((char*)&x, sizeof(T));
+    reads++;
     file.seekg(x.right * sizeof(T));
     file.read((char*)&y, sizeof(T));
+    reads++;
 
     long T2 = y.left; 
 
@@ -207,57 +220,64 @@ long AVLFile<Key, T>::leftRotate(fstream& file, long x_pos) {
 
     file.seekp(x_pos * sizeof(T));
     file.write((char*)&x, sizeof(T));
+    writes++;
     file.seekp(y.left * sizeof(T)); 
     file.write((char*)&y, sizeof(T));
+    writes++;
 
     return y.left; 
 }
 
 template<typename Key, typename T>
-int AVLFile<Key, T>::height(long pos_node, fstream& file) {
+int AVLFile<Key, T>::height(long pos_node, fstream& file, int& reads, int& writes) {
     if (pos_node == -1) return 0;
 
     T record;
     file.seekg(pos_node * sizeof(T));
     file.read((char*)&record, sizeof(T));
+    reads++;
     return record.height;
 }
 
 template<typename Key, typename T>
-void AVLFile<Key, T>::updateHeight(long pos_node, fstream& file) {
+void AVLFile<Key, T>::updateHeight(long pos_node, fstream& file, int& reads, int& writes) {
     if (pos_node == -1) return;
 
     T record;
     file.seekg(pos_node * sizeof(T));
     file.read((char*)&record, sizeof(T));
-    record.height = 1 + max(height(record.left, file), height(record.right, file));
+    reads++;
+    record.height = 1 + max(height(record.left, file, reads, writes), height(record.right, file, reads, writes));
 
     file.seekp(pos_node * sizeof(T));
     file.write((char*)&record, sizeof(T));
+    writes++;
 }
 
 template<typename Key, typename T>
-void AVLFile<Key, T>::inorder(long pos_node, vector<T>& result, fstream& file) {
+void AVLFile<Key, T>::inorderP(long pos_node, vector<T>& result, fstream& file, int& reads, int& writes) {
     if (pos_node == -1) return;
 
     T record;
     file.seekg(pos_node * sizeof(T));
     file.read((char*)&record, sizeof(T));
-    inorder(record.left, result, file);
+    reads++;
+    inorderP(record.left, result, file, reads, writes);
     result.push_back(record);
-    inorder(record.right, result, file);
+    inorderP(record.right, result, file, reads, writes);
 }
 
 template<typename Key, typename T>
-void AVLFile<Key, T>::rangeSearch(long pos_node, int start, int end, vector<T>& results, fstream& file) {
+void AVLFile<Key, T>::rangeSearchP(long pos_node, int start, int end, vector<T>& results, fstream& file, int& reads, int& writes) {
     if (pos_node == -1) return;
 
     T record;
     file.seekg(pos_node * sizeof(T));
     file.read((char*)&record, sizeof(T));
+    reads++;
 
     if (record.key > start) {
-        rangeSearch(record.left, start, end, results, file);
+        rangeSearchP(record.left, start, end, results, file, reads, writes);
     }
 
     if (record.key >= start && record.key <= end) {
@@ -265,12 +285,12 @@ void AVLFile<Key, T>::rangeSearch(long pos_node, int start, int end, vector<T>& 
     }
 
     if (record.key < end) {
-        rangeSearch(record.right, start, end, results, file);
+        rangeSearchP(record.right, start, end, results, file, reads, writes);
     }
 }
 
 template<typename Key, typename T>
-long AVLFile<Key, T>::deleteNode(long pos_node, Key key, fstream& file) {
+long AVLFile<Key, T>::deleteNode(long pos_node, Key key, fstream& file, int& reads, int& writes) {
     if (pos_node == -1) {
         return pos_node; // Nodo no encontrado
     }
@@ -278,11 +298,12 @@ long AVLFile<Key, T>::deleteNode(long pos_node, Key key, fstream& file) {
     T node;
     file.seekg(pos_node * sizeof(T));
     file.read((char*)&node, sizeof(T));
+    reads++;
 
     if (key < node.key) {
-        node.left = deleteNode(node.left, key, file);
+        node.left = deleteNode(node.left, key, file, reads, writes);
     } else if (key > node.key) {
-        node.right = deleteNode(node.right, key, file);
+        node.right = deleteNode(node.right, key, file, reads, writes);
     } else {
         // Encontramos el nodo a eliminar
         if (node.left == -1) {
@@ -296,6 +317,7 @@ long AVLFile<Key, T>::deleteNode(long pos_node, Key key, fstream& file) {
         while (true) {
             file.seekg(successor_pos * sizeof(T));
             file.read((char*)&node, sizeof(T));
+            reads++;
             if (node.left != -1) {
                 successor_pos = node.left; 
             } else {
@@ -306,22 +328,24 @@ long AVLFile<Key, T>::deleteNode(long pos_node, Key key, fstream& file) {
         T successor;
         file.seekg(successor_pos * sizeof(T));
         file.read((char*)&successor, sizeof(T));
+        reads++;
         long tmp_right = node.right;
         std::memcpy(&node, &successor, sizeof(T));
         node.right = tmp_right;
-        node.right = deleteNode(node.right, successor.key, file);
+        node.right = deleteNode(node.right, successor.key, file, reads, writes);
     }
 
     // Actualizar y equilibrar
     file.seekp(pos_node * sizeof(T));
     file.write((char*)&node, sizeof(T));
-    balance(file, pos_node);
+    reads++;
+    balance(file, pos_node, reads, writes);
 
     return pos_node;
 }
 
 template<typename Key, typename T>
-T AVLFile<Key, T>::search_by_key(Key key) {
+T AVLFile<Key, T>::search_by_key(Key key, int& reads, int& writes) {
     fstream file(this->filename, ios::in | ios::binary);
     if (this->pos_root == -1) {
         cout << "No hay elementos registrados" << endl;
@@ -333,6 +357,7 @@ T AVLFile<Key, T>::search_by_key(Key key) {
         T node;
         file.seekg(result_pos * sizeof(T));
         file.read((char*)&node, sizeof(T));
+        reads++;
 
         if (key < node.key) {
             result_pos = node.left; 
