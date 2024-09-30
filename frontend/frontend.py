@@ -24,7 +24,7 @@ def fetch_all_data(window):
         response = requests.get(f"http://localhost:8080/avl/get_all?table_name={table_name}")
         response.raise_for_status()
         global data
-        data = response.json()
+        data = response.json().get("results", [])  # Actualización aquí
 
         end_time = time.time()
         elapsed_time = end_time - start_time
@@ -50,7 +50,7 @@ def fetch_data_between(window):
         response = requests.get(f"http://localhost:8080/avl/get_between?table_name={table_name}&start={start}&end={end}")
         response.raise_for_status()
         global data
-        data = response.json()
+        data = response.json().get("results", [])  # Actualización aquí
 
         window.time_label.setText(f"Datos entre {start} y {end} cargados.")
         update_table(window)
@@ -72,7 +72,7 @@ def fetch_record(window):
         response = requests.get(f"http://localhost:8080/avl/get_record?table_name={table_name}&key={key}")
         response.raise_for_status()
         global data
-        data = [response.json()]
+        data = [response.json().get("results", {})]  # Actualización aquí
 
         window.time_label.setText(f"Registro con clave {key} cargado.")
         update_table(window)
@@ -180,9 +180,9 @@ def update_table(window):
     end_index = start_index + page_size
     for row_index, item in enumerate(data[start_index:end_index]):
         window.table.insertRow(row_index)
-        window.table.setItem(row_index, 0, QTableWidgetItem(str(item['key'])))
-        window.table.setItem(row_index, 1, QTableWidgetItem(item['GameTitle']))
-        window.table.setItem(row_index, 2, QTableWidgetItem(str(item['Year'])))
+        window.table.setItem(row_index, 0, QTableWidgetItem(str(item.get('key', ''))))
+        window.table.setItem(row_index, 1, QTableWidgetItem(item.get('GameTitle', '')))
+        window.table.setItem(row_index, 2, QTableWidgetItem(str(item.get('Year', ''))))
 
 def next_page(window):
     global current_page
@@ -270,7 +270,7 @@ class DataApp(QWidget):
         layout.addWidget(self.jp_input)
 
         self.row_input = QLineEdit()
-        self.row_input.setPlaceholderText("Ventas en el Resto del Mundo")
+        self.row_input.setPlaceholderText("Ventas en el resto del mundo")
         layout.addWidget(self.row_input)
 
         self.global_input = QLineEdit()
@@ -278,16 +278,16 @@ class DataApp(QWidget):
         layout.addWidget(self.global_input)
 
         self.review_input = QLineEdit()
-        self.review_input.setPlaceholderText("Reseñas")
+        self.review_input.setPlaceholderText("Reseña")
         layout.addWidget(self.review_input)
 
         self.insert_button = QPushButton("Insertar Registro")
         self.insert_button.clicked.connect(lambda: insert_record(self))
         layout.addWidget(self.insert_button)
 
-        # Campo para eliminar registro por clave
+        # Campo para eliminar registro
         self.remove_key_input = QLineEdit()
-        self.remove_key_input.setPlaceholderText("Clave para eliminar")
+        self.remove_key_input.setPlaceholderText("Clave del registro a eliminar")
         layout.addWidget(self.remove_key_input)
 
         self.remove_button = QPushButton("Eliminar Registro")
@@ -314,13 +314,13 @@ class DataApp(QWidget):
         self.time_label = QLabel("Tiempo de carga:")
         layout.addWidget(self.time_label)
 
-        # Tabla para mostrar los datos
+        # Tabla para mostrar datos
         self.table = QTableWidget()
         self.table.setColumnCount(3)
         self.table.setHorizontalHeaderLabels(["Clave", "Título del Juego", "Año"])
         layout.addWidget(self.table)
 
-        # Botones de paginación
+        # Botones para paginación
         pagination_layout = QHBoxLayout()
         self.prev_button = QPushButton("Anterior")
         self.prev_button.clicked.connect(lambda: previous_page(self))
@@ -331,9 +331,20 @@ class DataApp(QWidget):
         pagination_layout.addWidget(self.next_button)
         layout.addLayout(pagination_layout)
 
+        # Indicador de tiempo de carga
+        self.time_label = QLabel("Tiempo de carga:")
+        layout.addWidget(self.time_label)
+
+        # Indicador de carga
+        self.loading_label = QLabel()
+        pixmap = QPixmap("loading.gif")
+        self.loading_label.setPixmap(pixmap)
+        self.loading_label.setVisible(False)
+        layout.addWidget(self.loading_label)
+
         self.setLayout(layout)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = DataApp()
     window.show()
