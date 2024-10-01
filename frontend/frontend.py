@@ -76,7 +76,7 @@ def fetch_record(window):
         table_name = window.table_combo.currentText()
         key = window.key_input.text()
 
-        response = requests.get(f"http://localhost:8080/avl/get_record?table_name={table_name}&key={key}")
+        response = requests.get(f"http://localhost:8080/extendible/get_record?table_name={table_name}&key={key}")
         response.raise_for_status()
         global data
         data = [response.json().get("results", {})]  # Actualización aquí
@@ -133,7 +133,7 @@ def insert_record(window):
         }
 
         # Enviar el payload al backend
-        response = requests.post(f"http://localhost:8080/avl/post_record?table_name={table_name}", json=payload)
+        response = requests.post(f"http://localhost:8080/extendible/post_record?table_name={table_name}", json=payload)
         response.raise_for_status()
 
         end_time = time.time()
@@ -156,7 +156,7 @@ def remove_record(window):
         key = window.remove_key_input.text()
         table_name = window.table_combo.currentText()
 
-        response = requests.delete(f"http://localhost:8080/avl/delete_record?table_name={table_name}&key={key}")
+        response = requests.delete(f"http://localhost:8080/extendible/delete_record?table_name={table_name}&key={key}")
         response.raise_for_status()
 
         end_time = time.time()
@@ -181,7 +181,7 @@ def read_csv(window):
 
         payload = {"csv_path": csv_path}
 
-        response = requests.post(f"http://localhost:8080/avl/read_csv?table_name={table_name}", json=payload)
+        response = requests.post(f"http://localhost:8080/extendible/read_csv?table_name={table_name}", json=payload)
         response.raise_for_status()
 
         end_time = time.time()

@@ -70,15 +70,13 @@ private:
             seqHandler.get_record(request, request.request_uri());
         } else if (path.find(U("/sequential/get_between")) == 0) {
             seqHandler.get_between(request, request.request_uri());
-        } else {
-            request.reply(status_codes::NotFound, U("404 Not Found: Invalid path."));
         }
         /*
         //////////////////////////
                 EXTENDIBLE PATHS
         /////////////////////////
         */
-        if (path.find(U("/extendible/get_record")) == 0) {
+        else if (path.find(U("/extendible/get_record")) == 0) {
             ehHandler.get_record(request, request.request_uri());
         } else {
             request.reply(status_codes::NotFound, U("404 Not Found: Invalid path."));
@@ -108,14 +106,19 @@ private:
         } else if(path.find(U("/sequential/read_csv")) == 0){
             seqHandler.post_csv(request, request.request_uri());
         } 
-        else {
-            request.reply(status_codes::NotFound, U("404 Not Found: Invalid path."));
-        }
         /*
         //////////////////////////
                 EXTENDIBLE PATHS
         /////////////////////////
         */
+        else if (path.find(U("/extendible/post_record")) == 0) {
+            //ehHandler.post_record(request, request.request_uri());
+        } else if(path.find(U("/extendible/read_csv")) == 0){
+            ehHandler.post_csv(request, request.request_uri());
+        } 
+        else {
+            request.reply(status_codes::NotFound, U("404 Not Found: Invalid path."));
+        }
     }
 
     void handle_delete(http_request request) {
@@ -136,6 +139,14 @@ private:
         */
         else if (path.find(U("/sequential/delete_record")) == 0) {
             seqHandler.delete_record(request, request.request_uri());
+        }
+        /*
+        //////////////////////////
+                EXTENDIBLE PATHS
+        /////////////////////////
+        */
+        else if (path.find(U("/extendible/delete_record")) == 0) {
+            //ehHandler.delete_record(request, request.request_uri());
         } else {
             request.reply(status_codes::NotFound, U("404 Not Found: Invalid path."));
         }

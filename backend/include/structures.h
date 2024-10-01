@@ -5,8 +5,8 @@
 #include <strstream>
 using namespace std;
 
-#define DF 1 //Cantidad de elementos bucket
-const int DEPTH = 3; //binary
+#define DF 12 //Cantidad de elementos bucket
+const int DEPTH = 8; //binary
 
 //BUCKET
 template<typename T>

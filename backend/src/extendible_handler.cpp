@@ -69,10 +69,12 @@ public:
         
             }
             if (table_name == "game"){
-              extendible_hash<GamesEH<int>> hashq(table_name+"_EH.dat", table_name+"_EHindex.dat", "EmpID");
+              extendible_hash<GamesEH<int>> hashq(table_name+"_EH.dat", table_name+"_EHindex.dat", "index");
               int reads = 0; 
               int writes = 0;
               vector<GamesEH<int>> records = hashq.search(key);
+
+
               if(records.size() > 0){
                   json::value response_data = json::value::array();
                     for (size_t i = 0; i < records.size(); ++i) {
@@ -104,6 +106,160 @@ public:
 
         } else {
             request.reply(status_codes::BadRequest, U("Key and filename parameters are required."));
+        }
+    }
+    }
+   
+    void post_csv(http_request request, const uri& uri) {
+        auto query = uri::split_query(uri.query());
+        if (query.find(U("table_name")) != query.end()) {
+            std::string table_name = utility::conversions::to_utf8string(query[U("table_name")]);
+
+            request.extract_json().then([=](json::value request_data) {
+                if (request_data.has_field(U("csv_path"))) {
+                    std::string csv_path = utility::conversions::to_utf8string(request_data[U("csv_path")].as_string());
+
+                    try {
+                        if (table_name == "employee") {
+                            int sum_reads = 0;
+                            int sum_writes = 0;
+                            extendible_hash<EmployeeEH<int>> hashq(table_name+"_EH.dat", table_name+"_EHindex.dat", "EmpID");
+
+                            std::ifstream file(csv_path);
+                            if (!file.is_open()) {
+                                throw std::runtime_error("Error al abrir el archivo CSV.");
+                            }
+
+                            std::string line;
+                            // Ignorar el encabezado
+                            std::getline(file, line);
+                            
+                            while (std::getline(file, line)) {
+                                try {
+                                    std::vector<std::string> fields = split(line);
+                                    if (fields.size() != 26) { 
+                                        std::cerr << "Error: Línea con menos de 20 campos." << std::endl;
+                                        continue; 
+                                    }
+
+                                    int key = stoi(fields[0]); // EmpID
+                                    const char* firstName = fields[1].empty() ? "-" : fields[1].c_str();
+                                    const char* lastName = fields[2].empty() ? "-" : fields[2].c_str();
+                                    const char* startDate = fields[3].empty() ? "-" : fields[3].c_str();
+                                    const char* exitDate = fields[4].empty() ? "-" : fields[4].c_str();
+                                    const char* title = fields[5].empty() ? "-" : fields[5].c_str();
+                                    const char* supervisor = fields[6].empty() ? "-" : fields[6].c_str();
+                                    const char* email = fields[7].empty() ? "-" : fields[7].c_str();
+                                    const char* businessUnit = fields[8].empty() ? "-" : fields[8].c_str();
+                                    const char* employeeStatus = fields[9].empty() ? "-" : fields[9].c_str();
+                                    const char* employeeType = fields[10].empty() ? "-" : fields[10].c_str();
+                                    const char* payZone = fields[11].empty() ? "-" : fields[11].c_str();
+                                    const char* classificationType = fields[12].empty() ? "-" : fields[12].c_str();
+                                    const char* terminationType = fields[13].empty() ? "-" : fields[13].c_str();
+                                    const char* terminationDescription = fields[14].empty() ? "-" : fields[14].c_str();
+                                    const char* departmentType = fields[15].empty() ? "-" : fields[15].c_str();
+                                    const char* division = fields[16].empty() ? "-" : fields[16].c_str();
+                                    const char* dob = fields[17].empty() ? "-" : fields[17].c_str();
+                                    const char* state = fields[18].empty() ? "-" : fields[18].c_str();
+                                    const char* jobFunction = fields[19].empty() ? "-" : fields[19].c_str();
+                                    const char* genderCode = fields[20].empty() ? "-" : fields[20].c_str();
+                                    const char* locationCode = fields[21].empty() ? "-" : fields[21].c_str();
+                                    const char* raceDesc = fields[22].empty() ? "-" : fields[22].c_str();
+                                    const char* maritalDesc = fields[23].empty() ? "-" : fields[23].c_str();
+                                    const char* performanceScore = fields[24].empty() ? "-" : fields[24].c_str();
+                                    double currentEmployeeRating = fields[25].empty() ? -1.0 : stod(fields[25]);
+
+                                    // Crear un objeto EmployeeEH
+                                    EmployeeEH<int> record(key, firstName, lastName, startDate, exitDate, title, supervisor, email, businessUnit,
+                                                        employeeStatus, employeeType, payZone, classificationType, terminationType,
+                                                        terminationDescription, departmentType, division, dob, state, jobFunction,
+                                                        genderCode, locationCode, raceDesc, maritalDesc, performanceScore, currentEmployeeRating);
+
+                                    
+                                    int reads = 0;
+                                    int writes = 0;
+                                    hashq.add(record);
+                                    sum_reads += reads; 
+                                    sum_writes += writes;
+                                } catch (const std::exception &e) {
+                                    std::cerr << "Error al procesar la línea: " << line << " - " << e.what() << std::endl;
+                                    continue; // Continuar con la siguiente línea
+                                }
+                            }
+                            hashq.getData();
+                            std::cout << "End Reading" << std::endl;
+                            file.close();
+
+                            json::value responseJson;
+                            responseJson[U("message")] = json::value::string(U("CSV loaded."));
+                            responseJson[U("reads")] = json::value::number(sum_reads);
+                            responseJson[U("writes")] = json::value::number(sum_writes);
+                            request.reply(status_codes::OK, responseJson);
+                        } else if (table_name == "game") {
+                            extendible_hash<GamesEH<int>> hashq(table_name+"_EH.dat", table_name+"_EHindex.dat", "index");
+                            int sum_reads = 0;
+                            int sum_writes = 0;
+                            std::ifstream file(csv_path);
+                            if (!file.is_open()) {
+                                throw std::runtime_error("Error al abrir el archivo CSV.");
+                            }
+
+                            std::string line;
+                            std::getline(file, line); 
+                            
+                            while (std::getline(file, line)) {
+                                try {
+                                    std::vector<std::string> fields = split(line);
+                                    if (fields.size() != 13) {
+                                        std::cerr << "Error: Línea con menos de 13 campos." << std::endl;
+                                        continue;
+                                    }
+                                    
+                                    int key = fields[0].empty() ? -1 : stoi(fields[0]);
+                                    int rank = fields[1].empty() ? -1 : stoi(fields[1]);
+                                    const char* gameTitle = fields[2].empty() ? "-" : fields[2].c_str();
+                                    const char* platform = fields[3].empty() ? "-" : fields[3].c_str();
+                                    int year = fields[4].empty() ? -1 : stoi(fields[4]);
+                                    const char* genre = fields[5].empty() ? "-" : fields[5].c_str();
+                                    const char* publisher = fields[6].empty() ? "-" : fields[6].c_str();
+                                    double northAmerica = fields[7].empty() ? -1.0 : stod(fields[7]);
+                                    double europe = fields[8].empty() ? -1.0 : stod(fields[8]);
+                                    double japan = fields[9].empty() ? -1.0 : stod(fields[9]);
+                                    double restOfWorld = fields[10].empty() ? -1.0 : stod(fields[10]);
+                                    double global = fields[11].empty() ? -1.0 : stod(fields[11]);
+                                    double review = fields[12].empty() ? -1.0 : stod(fields[12]);
+
+                                    GamesEH<int> record(key, rank, gameTitle, platform, year, genre, publisher, northAmerica, europe, japan, restOfWorld, global, review);
+
+                                    int reads = 0;
+                                    int writes = 0;
+                                    hashq.add(record);
+                                    sum_reads += reads; 
+                                    sum_writes += writes;
+                                } catch (const std::exception &e) {
+                                    std::cerr << "Error al procesar la línea: " << line << " - " << e.what() << std::endl;
+                                    continue; // Continuar con la siguiente línea
+                                }
+                            }
+                            file.close();
+                            //hashq.getData();
+                            json::value responseJson;
+                            responseJson[U("message")] = json::value::string(U("CSV loaded."));
+                            responseJson[U("reads")] = json::value::number(sum_reads);
+                            responseJson[U("writes")] = json::value::number(sum_writes);
+                            request.reply(status_codes::OK, responseJson);
+                        } else {
+                            request.reply(status_codes::BadRequest, U("Invalid table name."));
+                        }
+                    } catch (const std::exception &e) {
+                        request.reply(status_codes::BadRequest, utility::conversions::to_string_t(e.what()));
+                    }
+                } else {
+                    request.reply(status_codes::BadRequest, U("Missing csv_path."));
+                }
+            }).wait(); // Espera a que la tarea asíncrona se complete
+        } else {
+            request.reply(status_codes::BadRequest, U("Missing table_name."));
         }
     }
 
@@ -258,147 +414,6 @@ public:
         }
     }
 
-    void post_csv(http_request request, const uri& uri) {
-        auto query = uri::split_query(uri.query());
-        if (query.find(U("table_name")) != query.end()) {
-            std::string table_name = utility::conversions::to_utf8string(query[U("table_name")]);
-
-            request.extract_json().then([=](json::value request_data) {
-                if (request_data.has_field(U("csv_path"))) {
-                    std::string csv_path = utility::conversions::to_utf8string(request_data[U("csv_path")].as_string());
-
-                    try {
-                        if (table_name == "employee") {
-                            int sum_reads = 0;
-                            int sum_writes = 0;
-                            AVLFile<int, EmployeeRecordAVL> avlFile(table_name + "_avl.dat");
-                            std::ifstream file(csv_path);
-                            if (!file.is_open()) {
-                                throw std::runtime_error("Error al abrir el archivo CSV.");
-                            }
-
-                            std::string line;
-                            // Ignorar el encabezado
-                            std::getline(file, line);
-                            
-                            while (std::getline(file, line)) {
-                                try {
-                                    std::vector<std::string> fields = split(line);
-                                    if (fields.size() < 20) { 
-                                        std::cerr << "Error: Línea con menos de 20 campos." << std::endl;
-                                        continue; 
-                                    }
-
-                                    EmployeeRecordAVL record;
-                                    record.key = std::stoi(fields[0]);
-                                    strcpy(record.FirstName, fields[1].c_str());
-                                    strcpy(record.LastName, fields[2].c_str());
-                                    strcpy(record.StartDate, fields[3].c_str());
-                                    strcpy(record.ExitDate, fields[4].c_str());
-                                    strcpy(record.Title, fields[5].c_str());
-                                    strcpy(record.Supervisor, fields[6].c_str());
-                                    strcpy(record.ADEmail, fields[7].c_str());
-                                    strcpy(record.BusinessUnit, fields[8].c_str());
-                                    strcpy(record.EmployeeStatus, fields[9].c_str());
-                                    strcpy(record.EmployeeType, fields[10].c_str());
-                                    strcpy(record.PayZone, fields[11].c_str());
-                                    strcpy(record.EmployeeClassificationType, fields[12].c_str());
-                                    strcpy(record.TerminationType, fields[13].c_str());
-                                    strcpy(record.TerminationDescription, fields[14].c_str());
-                                    strcpy(record.DepartmentType, fields[15].c_str());
-                                    strcpy(record.Division, fields[16].c_str());
-                                    strcpy(record.DOB, fields[17].c_str());
-                                    strcpy(record.State, fields[18].c_str());
-                                    strcpy(record.JobFunctionDescription, fields[19].c_str());
-                                    strcpy(record.GenderCode, fields[20].c_str());
-                                    strcpy(record.LocationCode, fields[21].c_str());
-                                    strcpy(record.RaceDesc, fields[22].c_str());
-                                    strcpy(record.MaritalDesc, fields[23].c_str());
-                                    strcpy(record.PerformanceScore, fields[24].c_str());
-                                    record.CurrentEmployeeRating = std::stod(fields[25]);
-
-                                    int reads = 0;
-                                    int writes = 0;
-                                    avlFile.insert(record, reads, writes);
-                                    sum_reads += reads; 
-                                    sum_writes += writes;
-                                } catch (const std::exception &e) {
-                                    std::cerr << "Error al procesar la línea: " << line << " - " << e.what() << std::endl;
-                                    continue; // Continuar con la siguiente línea
-                                }
-                            }
-                            cout << "End Reading" << endl;
-                            file.close();
-                            json::value responseJson;
-                            responseJson[U("message")] = json::value::string(U("CSV loaded."));
-                            responseJson[U("reads")] = json::value::number(sum_reads);
-                            responseJson[U("writes")] = json::value::number(sum_writes);
-                            request.reply(status_codes::OK, responseJson);
-                        } else if (table_name == "game") {
-                            int sum_reads = 0;
-                            int sum_writes = 0;
-                            AVLFile<int, GameRecordAVL> avlFile(table_name + "_avl.dat");
-                            std::ifstream file(csv_path);
-                            if (!file.is_open()) {
-                                throw std::runtime_error("Error al abrir el archivo CSV.");
-                            }
-
-                            std::string line;
-                            std::getline(file, line); 
-                            
-                            while (std::getline(file, line)) {
-                                try {
-                                    std::vector<std::string> fields = split(line);
-                                    if (fields.size() < 13) {
-                                        std::cerr << "Error: Línea con menos de 13 campos." << std::endl;
-                                        continue; 
-                                    }
-
-                                    GameRecordAVL record;
-                                    record.key = std::stoi(fields[0]);
-                                    record.Rank = std::stoi(fields[1]);
-                                    strcpy(record.GameTitle, fields[2].c_str());
-                                    strcpy(record.Platform, fields[3].c_str());
-                                    record.Year = static_cast<int>(std::stod(fields[4]));
-                                    strcpy(record.Genre, fields[5].c_str());
-                                    strcpy(record.Publisher, fields[6].c_str());
-                                    record.NorthAmerica = std::stod(fields[7]);
-                                    record.Europe = std::stod(fields[8]);
-                                    record.Japan = std::stod(fields[9]);
-                                    record.RestOfWorld = std::stod(fields[10]);
-                                    record.Global = std::stod(fields[11]);
-                                    record.Review = std::stod(fields[12]);
-
-                                    int reads = 0;
-                                    int writes = 0;
-                                    avlFile.insert(record, reads, writes);
-                                    sum_reads += reads; 
-                                    sum_writes += writes;
-                                } catch (const std::exception &e) {
-                                    std::cerr << "Error al procesar la línea: " << line << " - " << e.what() << std::endl;
-                                    continue; // Continuar con la siguiente línea
-                                }
-                            }
-                            file.close();
-                            json::value responseJson;
-                            responseJson[U("message")] = json::value::string(U("CSV loaded."));
-                            responseJson[U("reads")] = json::value::number(sum_reads);
-                            responseJson[U("writes")] = json::value::number(sum_writes);
-                            request.reply(status_codes::OK, responseJson);
-                        } else {
-                            request.reply(status_codes::BadRequest, U("Invalid table name."));
-                        }
-                    } catch (const std::exception &e) {
-                        request.reply(status_codes::BadRequest, utility::conversions::to_string_t(e.what()));
-                    }
-                } else {
-                    request.reply(status_codes::BadRequest, U("Missing csv_path."));
-                }
-            }).wait(); // Espera a que la tarea asíncrona se complete
-        } else {
-            request.reply(status_codes::BadRequest, U("Missing table_name."));
-        }
-    }
 
     void delete_record(http_request request, const uri& uri) {
         auto query = uri::split_query(uri.query());
@@ -430,5 +445,4 @@ public:
         } else {
             request.reply(status_codes::BadRequest, U("Key and filename parameters are required."));
         }*/
-    }
 };

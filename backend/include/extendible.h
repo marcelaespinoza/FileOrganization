@@ -20,40 +20,32 @@ private:
     int mergeBucket(Bucket<TK> &sourceBucket, Bucket<TK> &destinBucket);
     int writeBucket(Bucket<TK> &bucket, fstream &file, int pos);
     int readBucket(Bucket<TK> &bucket, fstream &file, int pos);
-
+    string hash_to_binary(TK record);
+    void loadIndices();
+    pair<string, int> getBucket(TK &record);
+    void saveIndex();
+    int validarBucket(const unordered_set<Index>& indices);
 
     int countRead;
     int countWrite;
     string filename, indexname;
     unordered_set<Index> indices;
     set<int> deletedBuckets;
-
-    string hash_to_binary(TK record);
-    void loadIndices();
-    pair<string, int> getBucket(TK &record);
-    void saveIndex();
-    int validarBucket(const unordered_set<Index>& indices);
 public:
     string indextype;
     extendible_hash(string _file, string _index, string _indextype);
-
     bool add(TK record);
     void splitIndex(unordered_set<Index>::const_iterator it, int bucket0, int bucket1);
-
     template <typename K>
     bool remove(const K& key);
-
     template <typename K>
     vector<TK> search(const K& key);
-
     void getData();
     void getIndices();
     void getDeletedBuckets();
     int getCountR();
     int getCountW();
-
     ~extendible_hash();
-
 };
 
 //Constructor
@@ -259,7 +251,7 @@ int extendible_hash<TK>::add(TK &record, fstream &file){
             Bucket<TK> newBucket;
             writeBucket(newBucket, file, bucket2);
 
-            cout<<"----"<<endl;
+            //cout<<"----"<<endl;
 
             TK players[DF+1];
             for (int i = 0; i < DF; ++i) players[i] = recordsBucket.elements[i];
@@ -312,6 +304,9 @@ int extendible_hash<TK>::deleteInBucket(Bucket<TK> &currentBucket, TK &record){
         if (play.Key() != record.Key()){
             newBucket.elements[newBucket.size] = play;
             newBucket.size +=1;
+        }else{
+            cout<<"BUCKET A ELIMINAR"<<endl;
+            cout<<play;
         }
     }
     //ModificarCurrentBucket
@@ -388,8 +383,8 @@ int extendible_hash<TK>::remove(TK &record, fstream &file, int prevBucket, int n
                 else claveBin[0] = '0';
 
                 Index temp(claveBin, -1,-1);
-                unordered_set<Index>::const_iterator it = indices.find(temp);
-                unordered_set<Index>::const_iterator it2 = indices.find(temp2);
+                auto it = indices.find(temp);
+                auto it2 = indices.find(temp2);
                 cout<<"clave bin hermana"<<it->binary<<endl;
 
                 Bucket<TK> bucketHermano;
@@ -481,6 +476,8 @@ template <typename K>
 vector<TK> extendible_hash<TK>::search(const K& key){
     vector<TK> result;
     TK record(key, indextype); // cambiar lo de cod, definir una variable privada que se inicializa con el constructor
+    cout<<"LLAVE ?IN?ICT: "<<key<<endl;
+    cout<<"LLAVE METIDA: "<<record.key<<endl;
 
     fstream file(this->filename, ios::in | ios::out | ios::binary);
     //if(!file.is_open()){return 0;}
@@ -539,6 +536,9 @@ void extendible_hash<TK>::getData(){
         cout<<endl;
     }
     cout<<file.tellp()<<endl;
+    cout<<"Indices:"<<endl;
+    getIndices();
+    cout<<"---------------------------------"<<endl;
 
     file.close();
 }
@@ -561,5 +561,6 @@ int extendible_hash<TK>::getCountW(){return this->countWrite;}
 
 template <typename TK>
 extendible_hash<TK>::~extendible_hash(){this->saveIndex();}
+
 
 #endif

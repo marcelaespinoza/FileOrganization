@@ -36,6 +36,7 @@ public:
             //strncpy(GameTitle, key, sizeof(this->GameTitle) - 1);
             //this->GameTitle[sizeof(this->GameTitle) - 1] = '\0';
         }else{
+            cout<<"ERROR"<<endl;
             cout<<keyType<<endl;
         }
 
