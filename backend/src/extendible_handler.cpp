@@ -263,7 +263,7 @@ public:
         }
     }
 
-   /*void post_record(http_request request, const uri& uri) { 
+   void post_record(http_request request, const uri& uri) { 
         auto query = uri::split_query(uri.query());
         if (query.find(U("table_name")) != query.end()) {
             std::string table_name = utility::conversions::to_utf8string(query[U("table_name")]);
@@ -295,7 +295,7 @@ public:
                     request_data.has_field(U("MaritalDesc")) && 
                     request_data.has_field(U("PerformanceScore")) && 
                     request_data.has_field(U("CurrentEmployeeRating"))) {
-                    EmployeeRecordAVL record;
+                    EmployeeEH<int> record;
                     record.key = request_data[U("key")].as_integer();
                     strncpy(record.FirstName, utility::conversions::to_utf8string(request_data[U("FirstName")].as_string()).c_str(), sizeof(record.FirstName) - 1);
                     record.FirstName[sizeof(record.FirstName) - 1] = '\0'; 
@@ -347,10 +347,11 @@ public:
                     record.PerformanceScore[sizeof(record.PerformanceScore) - 1] = '\0';
                     record.CurrentEmployeeRating = request_data[U("CurrentEmployeeRating")].as_double();
 
-                    AVLFile<int, EmployeeRecordAVL> avlFile(table_name+"_avl.dat");
+                    extendible_hash<EmployeeEH<int>> hashq(table_name+"_EH.dat", table_name+"_EHindex.dat", "EmpID");
+                    
                     int reads = 0;
                     int writes = 0;
-                    avlFile.insert(record, reads, writes);
+                    hashq.add(record);
                     json::value responseJson;
                     responseJson[U("reads")] = json::value::number(reads);
                     responseJson[U("writes")] = json::value::number(writes);
@@ -376,7 +377,7 @@ public:
                     request_data.has_field(U("Global")) && 
                     request_data.has_field(U("Review"))) {
 
-                    GameRecordAVL record;
+                    GamesEH<int> record;
                     record.key = request_data[U("key")].as_integer();
                     record.Rank = request_data[U("Rank")].as_integer();
                     strncpy(record.GameTitle, utility::conversions::to_utf8string(request_data[U("GameTitle")].as_string()).c_str(), sizeof(record.GameTitle) - 1);
@@ -397,9 +398,8 @@ public:
 
                     int reads = 0;
                     int writes = 0;
-                    AVLFile<int, GameRecordAVL> avlFile(table_name+"_avl.dat");
-                    avlFile.insert(record, reads, writes);
-
+                    extendible_hash<GamesEH<int>> hashq(table_name+"_EH.dat", table_name+"_EHindex.dat", "index");
+                    hashq.add(record);
                     json::value responseJson;
                     responseJson[U("reads")] = json::value::number(reads);
                     responseJson[U("writes")] = json::value::number(writes);
@@ -422,20 +422,20 @@ public:
             std::string table_name = utility::conversions::to_utf8string(query[U("table_name")]);
 
             if(table_name == "employee"){
-                AVLFile<int, EmployeeRecordAVL> avlFile(table_name+"_avl.dat");
+                extendible_hash<EmployeeEH<int>> hashq(table_name+"_EH.dat", table_name+"_EHindex.dat", "index");
                 int reads = 0;
                 int writes = 0;
-                avlFile.delete_by_key(key, reads, writes);
+                hashq.remove(key);
                 json::value responseJson;
                 responseJson[U("message")] = json::value::string(U("Record deleted successfully."));
                 responseJson[U("reads")] = json::value::number(reads);
                 responseJson[U("writes")] = json::value::number(writes);
                 request.reply(status_codes::OK, responseJson);
             } if (table_name == "game"){
-                AVLFile<int, GameRecordAVL> avlFile(table_name+"_avl.dat");
+                extendible_hash<GamesEH<int>> hashq(table_name+"_EH.dat", table_name+"_EHindex.dat", "index");
                 int reads = 0;
                 int writes = 0;
-                avlFile.delete_by_key(key, reads, writes);
+                hashq.remove(key);
                 json::value responseJson;
                 responseJson[U("message")] = json::value::string(U("Record deleted successfully."));
                 responseJson[U("reads")] = json::value::number(reads);
@@ -444,5 +444,6 @@ public:
             }
         } else {
             request.reply(status_codes::BadRequest, U("Key and filename parameters are required."));
-        }*/
+        }
+}
 };

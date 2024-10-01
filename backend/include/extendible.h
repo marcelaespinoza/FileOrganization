@@ -322,6 +322,7 @@ int extendible_hash<TK>::mergeBucket(Bucket<TK> &sourceBucket, Bucket<TK> &desti
         destinBucket.elements[destinBucket.size + i] = sourceBucket.elements[i];
     }
     destinBucket.size += sourceBucket.size;
+    return 1;
 }
 
 
@@ -454,7 +455,7 @@ int extendible_hash<TK>::remove(TK &record, fstream &file, int prevBucket, int n
     }
     if(currentBucket.nextBucket != -1) remove(record, file, bucket, currentBucket.nextBucket);
 
-
+    return 1;
 
 }
 
