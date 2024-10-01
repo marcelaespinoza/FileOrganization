@@ -2,6 +2,7 @@
 #include <cpprest/uri.h>
 #include "avl_handler.cpp"      // Incluye el manejador AVL
 #include "sequential_handler.cpp" // Incluye el manejador secuencial
+#include "extendible_handler.cpp"
 #include "../include/utils.h" // Incluye el manejador secuencial
 
 using namespace web;
@@ -41,6 +42,7 @@ private:
     http_listener listener;
     AVLHandler avlHandler; // Manejador AVL
     SequentialHandler seqHandler; // Manejador secuencial
+    ExtendibleHandler ehHandler;
 
     void handle_get(http_request request) {
         auto path = request.request_uri().path();
@@ -68,6 +70,16 @@ private:
             seqHandler.get_record(request, request.request_uri());
         } else if (path.find(U("/sequential/get_between")) == 0) {
             seqHandler.get_between(request, request.request_uri());
+        } else {
+            request.reply(status_codes::NotFound, U("404 Not Found: Invalid path."));
+        }
+        /*
+        //////////////////////////
+                EXTENDIBLE PATHS
+        /////////////////////////
+        */
+        if (path.find(U("/extendible/get_record")) == 0) {
+            ehHandler.get_record(request, request.request_uri());
         } else {
             request.reply(status_codes::NotFound, U("404 Not Found: Invalid path."));
         }
@@ -99,6 +111,11 @@ private:
         else {
             request.reply(status_codes::NotFound, U("404 Not Found: Invalid path."));
         }
+        /*
+        //////////////////////////
+                EXTENDIBLE PATHS
+        /////////////////////////
+        */
     }
 
     void handle_delete(http_request request) {
@@ -122,6 +139,7 @@ private:
         } else {
             request.reply(status_codes::NotFound, U("404 Not Found: Invalid path."));
         }
+        
     }
 };
 
