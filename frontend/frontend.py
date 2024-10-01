@@ -80,12 +80,13 @@ def fetch_record(window):
         index_name = window.index_combo.currentText()
 
         key = window.key_input.text()
-
+        
         response = requests.get(f"http://localhost:8080/{index_name}/get_record?table_name={table_name}&key={key}")
         response.raise_for_status()
         global data
-        data = [response.json().get("results", {})]  # Actualización aquí
-
+        data = [response.json().get("results", {})] 
+        print(data)
+        
         end_time = time.time()
         elapsed_time_ms = (end_time - start_time) * 1000  # Convertir a milisegundos
         window.time_label.setText(f"Registro con clave {key} cargado en {elapsed_time_ms:.2f} ms")

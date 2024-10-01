@@ -73,10 +73,11 @@ public:
               int reads = 0; 
               int writes = 0;
               vector<GamesEH<int>> records = hashq.search(key);
-
-
+              for(auto record:records) cout<<record<<endl;
+              
               if(records.size() > 0){
-                  json::value response_data = json::value::array();
+                  GamesEH<int> record = records[0];
+                  /*json::value response_data = json::value::array();
                     for (size_t i = 0; i < records.size(); ++i) {
                         json::value recordJson;
                         recordJson[U("key")] = web::json::value::number(records[i].key);
@@ -98,6 +99,26 @@ public:
                     responseJson[U("reads")] = json::value::number(reads);
                     responseJson[U("writes")] = json::value::number(writes);
                     responseJson[U("results")] = response_data;
+                    request.reply(status_codes::OK, responseJson);*/
+                    json::value recordJson;
+                    recordJson[U("key")] = web::json::value::number(record.key);
+                    recordJson[U("Rank")] = web::json::value::number(record.Rank);
+                    recordJson[U("GameTitle")] = web::json::value::string(utility::conversions::to_string_t(record.GameTitle));
+                    recordJson[U("Platform")] = web::json::value::string(utility::conversions::to_string_t(record.Platform));
+                    recordJson[U("Year")] = web::json::value::number(record.Year);
+                    recordJson[U("Genre")] = web::json::value::string(utility::conversions::to_string_t(record.Genre));
+                    recordJson[U("Publisher")] = web::json::value::string(utility::conversions::to_string_t(record.Publisher));
+                    recordJson[U("NorthAmerica")] = web::json::value::number(record.NorthAmerica);
+                    recordJson[U("Europe")] = web::json::value::number(record.Europe);
+                    recordJson[U("Japan")] = web::json::value::number(record.Japan);
+                    recordJson[U("RestOfWorld")] = web::json::value::number(record.RestOfWorld);
+                    recordJson[U("Global")] = web::json::value::number(record.Global);
+                    recordJson[U("Review")] = web::json::value::number(record.Review);
+
+                    json::value responseJson;
+                    responseJson[U("reads")] = json::value::number(reads);
+                    responseJson[U("writes")] = json::value::number(writes);
+                    responseJson[U("results")] = recordJson;
                     request.reply(status_codes::OK, responseJson);
 
                 }else {
