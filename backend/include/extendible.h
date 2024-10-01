@@ -6,7 +6,7 @@
 #include <functional> //hash function
 #include <bitset>
 #include <unordered_set>
-#include "Structures.h"
+#include "structures.h"
 #include <set>
 
 template <typename TK>

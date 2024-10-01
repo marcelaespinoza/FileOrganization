@@ -46,61 +46,11 @@ public:
         strcpy(this->PerformanceScore, _PerformanceScore);
         this->CurrentEmployeeRating = _CurrentEmployeeRating;
     }
-    EmployeeEH(TK key, string keyType){//CONSTRUCTOR PARA EXTENDER A MAS tipos de keys
-        if(keyType == "EmpID"){
+    EmployeeEH(TK key, string keyType): EmployeeEH(0, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 0.0){
+        if (keyType == "EmpID") {
             this->key = key;
-            strcpy(this->FirstName, "");
-            strcpy(this->LastName, "");
-            strcpy(this->StartDate, "");
-            strcpy(this->ExitDate, "");
-            strcpy(this->Title, "");
-            strcpy(this->Supervisor, "");
-            strcpy(this->ADEmail, "");
-            strcpy(this->BusinessUnit, "");
-            strcpy(this->EmployeeStatus, "");
-            strcpy(this->EmployeeType, "");
-            strcpy(this->PayZone, "");
-            strcpy(this->EmployeeClassificationType, "");
-            strcpy(this->TerminationType, "");
-            strcpy(this->TerminationDescription, "");
-            strcpy(this->DepartmentType, "");
-            strcpy(this->Division, "");
-            strcpy(this->DOB, "");
-            strcpy(this->State, "");
-            strcpy(this->JobFunctionDescription, "");
-            strcpy(this->GenderCode, "");
-            strcpy(this->LocationCode, "");
-            strcpy(this->RaceDesc, "");
-            strcpy(this->MaritalDesc, "");
-            strcpy(this->PerformanceScore, "");
-            this->CurrentEmployeeRating = 0.0;
-        }else if(keyType == "FirstName"){
-                this->key = 0;
-                strcpy(this->FirstName, key);
-                strcpy(this->LastName, "");
-                strcpy(this->StartDate, "");
-                strcpy(this->ExitDate, "");
-                strcpy(this->Title, "");
-                strcpy(this->Supervisor, "");
-                strcpy(this->ADEmail, "");
-                strcpy(this->BusinessUnit, "");
-                strcpy(this->EmployeeStatus, "");
-                strcpy(this->EmployeeType, "");
-                strcpy(this->PayZone, "");
-                strcpy(this->EmployeeClassificationType, "");
-                strcpy(this->TerminationType, "");
-                strcpy(this->TerminationDescription, "");
-                strcpy(this->DepartmentType, "");
-                strcpy(this->Division, "");
-                strcpy(this->DOB, "");
-                strcpy(this->State, "");
-                strcpy(this->JobFunctionDescription, "");
-                strcpy(this->GenderCode, "");
-                strcpy(this->LocationCode, "");
-                strcpy(this->RaceDesc, "");
-                strcpy(this->MaritalDesc, "");
-                strcpy(this->PerformanceScore, "");
-                this->CurrentEmployeeRating = 0.0;
+        } else if (keyType == "FirstName") {
+            //strcpy(this->FirstName, key);
         }
     }
 
@@ -251,6 +201,5 @@ ostream& operator<<(ostream& os, const EmployeeEH<K>& record) {
     os << "CurrentEmployeeRating: " << record.CurrentEmployeeRating << "\n";
     return os;
 }
-
 
 #endif 

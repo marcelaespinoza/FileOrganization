@@ -2,7 +2,7 @@
 #define GAMES_EH
 #include "game.h"
 #include <iomanip>
-#include <sstream>
+#include <strstream>
 using namespace std;
 
 
@@ -29,6 +29,20 @@ public:
         this->Review = review;
     }
 
+    GamesEH(TK key, string keyType): GamesEH(0, 0, "", "", 0, "", "", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0){
+        if (keyType == "index") {
+            this->key = key;
+        } else if (keyType == "GameTitle") {
+            //strncpy(GameTitle, key, sizeof(this->GameTitle) - 1);
+            //this->GameTitle[sizeof(this->GameTitle) - 1] = '\0';
+        }else{
+            cout<<keyType<<endl;
+        }
+
+        //Extender para todos los campos
+    }
+
+
     string Key() const{
         ostrstream key;
         key<<this->key<<ends;
@@ -53,23 +67,26 @@ public:
 
     }
     GamesEH& operator=(const GamesEH& other) {
-        key = other.key;
-        Rank = other.Rank;
-        strcpy(GameTitle, other.GameTitle,sizeof(this->GameTitle) - 1);
-        this->GameTitle[sizeof(this->GameTitle) - 1] = '\0';
-        strcpy(Platform, other.Platform, sizeof(this->Platform) - 1);
-        this->Platform[sizeof(this->Platform) - 1] = '\0';
-        Year = other.Year;
-        strcpy(Genre, other.Genre, sizeof(this->Genre) - 1);
-        this->Genre[sizeof(this->Genre) - 1] = '\0';
-        strcpy(Publisher, other.Publisher, sizeof(this->Publisher) - 1);
-        this->Publisher[sizeof(this->Publisher) - 1] = '\0';
-        NorthAmerica = other.NorthAmerica;
-        Europe = other.Europe;
-        Japan = other.Japan;
-        RestOfWorld = other.RestOfWorld;
-        Global = other.Global;
-        Review = other.Review;
+        if (this != &other) {
+            key = other.key;
+            Rank = other.Rank;
+            strncpy(GameTitle, other.GameTitle, sizeof(this->GameTitle) - 1);
+            this->GameTitle[sizeof(this->GameTitle) - 1] = '\0';
+            strncpy(Platform, other.Platform, sizeof(this->Platform) - 1);
+            this->Platform[sizeof(this->Platform) - 1] = '\0';
+            Year = other.Year;
+            strncpy(Genre, other.Genre, sizeof(this->Genre) - 1);
+            this->Genre[sizeof(this->Genre) - 1] = '\0';
+            strncpy(Publisher, other.Publisher, sizeof(this->Publisher) - 1);
+            this->Publisher[sizeof(this->Publisher) - 1] = '\0';
+            NorthAmerica = other.NorthAmerica;
+            Europe = other.Europe;
+            Japan = other.Japan;
+            RestOfWorld = other.RestOfWorld;
+            Global = other.Global;
+            Review = other.Review;
+        }
+        return *this;
 
     }
 

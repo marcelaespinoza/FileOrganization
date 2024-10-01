@@ -29,32 +29,32 @@ public:
                   json::value response_data = json::value::array();
                     for (size_t i = 0; i < records.size(); ++i) {
                         json::value recordJson;
-                        recordJson[U("EmpID")] = web::json::value::number(inorderResult[i].key);
-                        recordJson[U("FirstName")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].FirstName));
-                        recordJson[U("LastName")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].LastName));
-                        recordJson[U("StartDate")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].StartDate));
-                        recordJson[U("ExitDate")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].ExitDate));
-                        recordJson[U("Title")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].Title));
-                        recordJson[U("Supervisor")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].Supervisor));
-                        recordJson[U("ADEmail")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].ADEmail));
-                        recordJson[U("BusinessUnit")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].BusinessUnit));
-                        recordJson[U("EmployeeStatus")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].EmployeeStatus));
-                        recordJson[U("EmployeeType")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].EmployeeType));
-                        recordJson[U("PayZone")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].PayZone));
-                        recordJson[U("EmployeeClassificationType")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].EmployeeClassificationType));
-                        recordJson[U("TerminationType")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].TerminationType));
-                        recordJson[U("TerminationDescription")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].TerminationDescription));
-                        recordJson[U("DepartmentType")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].DepartmentType));
-                        recordJson[U("Division")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].Division));
-                        recordJson[U("DOB")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].DOB));
-                        recordJson[U("State")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].State));
-                        recordJson[U("JobFunctionDescription")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].JobFunctionDescription));
-                        recordJson[U("GenderCode")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].GenderCode));
-                        recordJson[U("LocationCode")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].LocationCode));
-                        recordJson[U("RaceDesc")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].RaceDesc));
-                        recordJson[U("MaritalDesc")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].MaritalDesc));
-                        recordJson[U("PerformanceScore")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].PerformanceScore));
-                        recordJson[U("CurrentEmployeeRating")] = web::json::value::number(inorderResult[i].CurrentEmployeeRating);
+                        recordJson[U("EmpID")] = web::json::value::number(records[i].key);
+                        recordJson[U("FirstName")] = web::json::value::string(utility::conversions::to_string_t(records[i].FirstName));
+                        recordJson[U("LastName")] = web::json::value::string(utility::conversions::to_string_t(records[i].LastName));
+                        recordJson[U("StartDate")] = web::json::value::string(utility::conversions::to_string_t(records[i].StartDate));
+                        recordJson[U("ExitDate")] = web::json::value::string(utility::conversions::to_string_t(records[i].ExitDate));
+                        recordJson[U("Title")] = web::json::value::string(utility::conversions::to_string_t(records[i].Title));
+                        recordJson[U("Supervisor")] = web::json::value::string(utility::conversions::to_string_t(records[i].Supervisor));
+                        recordJson[U("ADEmail")] = web::json::value::string(utility::conversions::to_string_t(records[i].ADEmail));
+                        recordJson[U("BusinessUnit")] = web::json::value::string(utility::conversions::to_string_t(records[i].BusinessUnit));
+                        recordJson[U("EmployeeStatus")] = web::json::value::string(utility::conversions::to_string_t(records[i].EmployeeStatus));
+                        recordJson[U("EmployeeType")] = web::json::value::string(utility::conversions::to_string_t(records[i].EmployeeType));
+                        recordJson[U("PayZone")] = web::json::value::string(utility::conversions::to_string_t(records[i].PayZone));
+                        recordJson[U("EmployeeClassificationType")] = web::json::value::string(utility::conversions::to_string_t(records[i].EmployeeClassificationType));
+                        recordJson[U("TerminationType")] = web::json::value::string(utility::conversions::to_string_t(records[i].TerminationType));
+                        recordJson[U("TerminationDescription")] = web::json::value::string(utility::conversions::to_string_t(records[i].TerminationDescription));
+                        recordJson[U("DepartmentType")] = web::json::value::string(utility::conversions::to_string_t(records[i].DepartmentType));
+                        recordJson[U("Division")] = web::json::value::string(utility::conversions::to_string_t(records[i].Division));
+                        recordJson[U("DOB")] = web::json::value::string(utility::conversions::to_string_t(records[i].DOB));
+                        recordJson[U("State")] = web::json::value::string(utility::conversions::to_string_t(records[i].State));
+                        recordJson[U("JobFunctionDescription")] = web::json::value::string(utility::conversions::to_string_t(records[i].JobFunctionDescription));
+                        recordJson[U("GenderCode")] = web::json::value::string(utility::conversions::to_string_t(records[i].GenderCode));
+                        recordJson[U("LocationCode")] = web::json::value::string(utility::conversions::to_string_t(records[i].LocationCode));
+                        recordJson[U("RaceDesc")] = web::json::value::string(utility::conversions::to_string_t(records[i].RaceDesc));
+                        recordJson[U("MaritalDesc")] = web::json::value::string(utility::conversions::to_string_t(records[i].MaritalDesc));
+                        recordJson[U("PerformanceScore")] = web::json::value::string(utility::conversions::to_string_t(records[i].PerformanceScore));
+                        recordJson[U("CurrentEmployeeRating")] = web::json::value::number(records[i].CurrentEmployeeRating);
                         response_data[i] = recordJson;
                     }
                     json::value responseJson;
@@ -77,19 +77,19 @@ public:
                   json::value response_data = json::value::array();
                     for (size_t i = 0; i < records.size(); ++i) {
                         json::value recordJson;
-                        recordJson[U("key")] = web::json::value::number(inorderResult[i].key);
-                        recordJson[U("Rank")] = web::json::value::number(inorderResult[i].Rank);
-                        recordJson[U("GameTitle")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].GameTitle));
-                        recordJson[U("Platform")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].Platform));
-                        recordJson[U("Year")] = web::json::value::number(inorderResult[i].Year);
-                        recordJson[U("Genre")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].Genre));
-                        recordJson[U("Publisher")] = web::json::value::string(utility::conversions::to_string_t(inorderResult[i].Publisher));
-                        recordJson[U("NorthAmerica")] = web::json::value::number(inorderResult[i].NorthAmerica);
-                        recordJson[U("Europe")] = web::json::value::number(inorderResult[i].Europe);
-                        recordJson[U("Japan")] = web::json::value::number(inorderResult[i].Japan);
-                        recordJson[U("RestOfWorld")] = web::json::value::number(inorderResult[i].RestOfWorld);
-                        recordJson[U("Global")] = web::json::value::number(inorderResult[i].Global);
-                        recordJson[U("Review")] = web::json::value::number(inorderResult[i].Review);
+                        recordJson[U("key")] = web::json::value::number(records[i].key);
+                        recordJson[U("Rank")] = web::json::value::number(records[i].Rank);
+                        recordJson[U("GameTitle")] = web::json::value::string(utility::conversions::to_string_t(records[i].GameTitle));
+                        recordJson[U("Platform")] = web::json::value::string(utility::conversions::to_string_t(records[i].Platform));
+                        recordJson[U("Year")] = web::json::value::number(records[i].Year);
+                        recordJson[U("Genre")] = web::json::value::string(utility::conversions::to_string_t(records[i].Genre));
+                        recordJson[U("Publisher")] = web::json::value::string(utility::conversions::to_string_t(records[i].Publisher));
+                        recordJson[U("NorthAmerica")] = web::json::value::number(records[i].NorthAmerica);
+                        recordJson[U("Europe")] = web::json::value::number(records[i].Europe);
+                        recordJson[U("Japan")] = web::json::value::number(records[i].Japan);
+                        recordJson[U("RestOfWorld")] = web::json::value::number(records[i].RestOfWorld);
+                        recordJson[U("Global")] = web::json::value::number(records[i].Global);
+                        recordJson[U("Review")] = web::json::value::number(records[i].Review);
                         response_data[i] = recordJson;
                     }
                     json::value responseJson;
@@ -429,6 +429,6 @@ public:
             }
         } else {
             request.reply(status_codes::BadRequest, U("Key and filename parameters are required."));
-        }
-    }*/
+        }*/
+    }
 };
