@@ -20,8 +20,9 @@ def fetch_all_data(window):
 
     try:
         table_name = window.table_combo.currentText()
+        index_name = window.index_combo.currentText()
 
-        response = requests.get(f"http://localhost:8080/avl/get_all?table_name={table_name}")
+        response = requests.get(f"http://localhost:8080/{index_name}/get_all?table_name={table_name}")
         response.raise_for_status()
         global data
         data = response.json().get("results", [])  # Actualización aquí
@@ -48,8 +49,10 @@ def fetch_data_between(window):
         table_name = window.table_combo.currentText()
         start = window.start_input.text()
         end = window.end_input.text()
+        index_name = window.index_combo.currentText()
 
-        response = requests.get(f"http://localhost:8080/avl/get_between?table_name={table_name}&start={start}&end={end}")
+
+        response = requests.get(f"http://localhost:8080/{index_name}/get_between?table_name={table_name}&start={start}&end={end}")
         response.raise_for_status()
         global data
         data = response.json().get("results", [])  # Actualización aquí
@@ -74,9 +77,11 @@ def fetch_record(window):
 
     try:
         table_name = window.table_combo.currentText()
+        index_name = window.index_combo.currentText()
+
         key = window.key_input.text()
 
-        response = requests.get(f"http://localhost:8080/extendible/get_record?table_name={table_name}&key={key}")
+        response = requests.get(f"http://localhost:8080/{index_name}/get_record?table_name={table_name}&key={key}")
         response.raise_for_status()
         global data
         data = [response.json().get("results", {})]  # Actualización aquí
@@ -102,6 +107,7 @@ def insert_record(window):
     try:
         # Obtener los valores de los campos de entrada
         table_name = window.table_combo.currentText()
+        index_name = window.index_combo.currentText()
         key = int(window.key_input.text())
         game_title = window.game_title_input.text()
         platform = window.platform_input.text()
@@ -133,7 +139,7 @@ def insert_record(window):
         }
 
         # Enviar el payload al backend
-        response = requests.post(f"http://localhost:8080/extendible/post_record?table_name={table_name}", json=payload)
+        response = requests.post(f"http://localhost:8080/{index_name}/post_record?table_name={table_name}", json=payload)
         response.raise_for_status()
 
         end_time = time.time()
@@ -155,8 +161,9 @@ def remove_record(window):
     try:
         key = window.remove_key_input.text()
         table_name = window.table_combo.currentText()
+        index_name = window.index_combo.currentText()
 
-        response = requests.delete(f"http://localhost:8080/extendible/delete_record?table_name={table_name}&key={key}")
+        response = requests.delete(f"http://localhost:8080/{index_name}/delete_record?table_name={table_name}&key={key}")
         response.raise_for_status()
 
         end_time = time.time()
@@ -178,10 +185,12 @@ def read_csv(window):
     try:
         csv_path = window.csv_path_input.text()
         table_name = window.table_combo.currentText()
+        index_name = window.index_combo.currentText()
+
 
         payload = {"csv_path": csv_path}
 
-        response = requests.post(f"http://localhost:8080/extendible/read_csv?table_name={table_name}", json=payload)
+        response = requests.post(f"http://localhost:8080/{index_name}/read_csv?table_name={table_name}", json=payload)
         response.raise_for_status()
 
         end_time = time.time()
@@ -230,7 +239,7 @@ def update_table(window):
         # Llenar la tabla con los datos
         for row_index, item in enumerate(data[start_index:end_index]):
             window.table.insertRow(row_index)
-            window.table.setItem(row_index, 0, QTableWidgetItem(str(item.get('EmpID', ''))))
+            window.table.setItem(row_index, 0, QTableWidgetItem(str(item.get('key', ''))))
             window.table.setItem(row_index, 1, QTableWidgetItem(item.get('FirstName', '')))
             window.table.setItem(row_index, 2, QTableWidgetItem(item.get('LastName', '')))
             window.table.setItem(row_index, 3, QTableWidgetItem(item.get('StartDate', '')))
@@ -263,6 +272,11 @@ class DataApp(QWidget):
         self.table_combo = QComboBox()
         self.table_combo.addItems(["game", "employee"])
         layout.addWidget(self.table_combo)
+
+        # ComboBox para seleccionar el metodo
+        self.index_combo = QComboBox()
+        self.index_combo.addItems(["avl", "sequential", "extendible"])
+        layout.addWidget(self.index_combo)
 
         # Botón para obtener todos los datos
         self.get_all_button = QPushButton("Obtener Todos los Datos")
